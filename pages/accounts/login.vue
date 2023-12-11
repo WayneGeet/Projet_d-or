@@ -33,6 +33,7 @@ async function login() {
     await authStore.setAuthentication({email:email.value, password:password.value})
     await navigateTo("/projects/")
 }    
+console.log(authStore.user)
 
 // nuxtStorage.localStorage.setData('access_token1', );
 

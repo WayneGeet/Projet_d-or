@@ -30,7 +30,7 @@
                 <label class="flex items-center gap-4" for="locate"><span>
                         <IconesFlag />
                     </span>Select project location</label>
-                <input @focus="handleFocus" type="text" name="locate" id="locate">
+                <input @focus="handleFocus" type="text" name="locate" id="locate" :value="search_text">
                 </div>
                 <button type="submit">Submit</button>
         </form>
@@ -51,14 +51,14 @@
                     <article class="w-full gap-4 relative flex items-center mb-[10rem]">
                         <label for="location" class=""><IconesFlag /></label>
                         <span class="relative w-full">
-                            <input class="w-full" type="text" name="location" id="location" v-model="search_text" placeholder="Where's the project?"/>
+                            <input @focus="isWatching=true" class="w-full" type="text" name="location" id="location" v-model="search_text" placeholder="Where's the project?"/>
                             <span @click="search_text='' " class="p-[4px] rounded-full bg-gray-400 absolute text-white top-1/2 mr-2 cursor-pointer -translate-y-1/2 right-0 text-md"><IconesClose/></span>
                         </span>
                         
 
                         <!---------------------- list of places ----------------------------->
 
-                        <article v-if="places_dialog" class="rounded-md shadow-lg shadow-grey-600 px-1 min-h-[3rem] absolute top-[2.5rem] left-8 flex flex-col gap-1 bg-white w-[90%]">
+                        <article v-if="isWatching" class="rounded-md shadow-lg shadow-grey-600 px-1 min-h-[3rem] absolute top-[2.5rem] left-8 flex flex-col gap-1 bg-white w-[90%]">
                             
                             <img v-if="pend" class="w-10" src="~/assets/images/loader_2.gif" alt="loading">
                             <div v-else-if="!pend && places.length" @click="handlePlaceSelect(local)" class="cursor-pointer hover:bg-slate-200" v-for="local in computed_places"
@@ -70,7 +70,6 @@
     
                         </article>
                     </article>
-                    
 
                     <article class="w-full flex items-center gap-4 mb-[10rem]">
                         <button class="text-lime-600 text-[1rem]">
@@ -83,7 +82,7 @@
 
                 <section class="aspect-video overflow-hidden top-1/2">
                     <!-- <img class="object-cover aspect-video" src="~/assets/images/location.jpg" alt="location" /> -->
-                    <Mapbox :lat="lnglat[1]" :lng="lnglat[0]" :zoom="zoom" style="position: relative;"/>
+                    <Mapbox title="Welcome to Map View" :control="control" style="position: absolute; top: 0; bottom: 0;"></Mapbox>
                 </section>
 
                 <!-- <article v-if="showMap">
@@ -119,49 +118,43 @@ const pend = ref(true)
 const places = ref(null)
 const computed_places = ref(null)
 const places_dialog = ref(false)
-watchEffect(() => {
-    if(search_text.value){
-        places_dialog.value = true
+// watchEffect(() => {
+//     if(search_text.value){
+//         isWatching.value = true
+//     }
+//     else isWatching.value = false
+// })
+const isWatching = ref(false)
+
+watch(search_text, async (newText, oldText) => {
+    if(oldText.length < newText.length && isWatching.value){
+        const { data, pending } = await useLazyFetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${search_text.value}.json?access_token=pk.eyJ1Ijoid2F5bmUtZ2VldCIsImEiOiJjbGtjZWlnOXQwMmRiM2twZG05b2VldmcyIn0.93DilXpZMzPqgn_C7Y7L3w&country=KE`, {
+        })
+        const places_value = await data.value
+        console.log(places_value)
+        pend.value = pending.value
+        places.value = places_value?.features
+        const places_computed = computed(() => {
+            return places.value?.filter((place, index) => index <=2)
+        })
+        computed_places.value = places_computed.value
     }
-    else places_dialog.value = false
+    
 })
 
-
-const fetchPlaces = async () => {
-    // places_dialog.value = true
-    const { data, pending } = await useLazyFetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${search_text.value}.json?access_token=pk.eyJ1Ijoid2F5bmUtZ2VldCIsImEiOiJjbGtjZWlnOXQwMmRiM2twZG05b2VldmcyIn0.93DilXpZMzPqgn_C7Y7L3w&country=KE`, {
-    })
-    const places_value = await data.value
-    pend.value = pending.value
-    console.log(pend.value)
-    places.value = places_value?.features
-    const places_computed = computed(() => {
-        return places.value?.filter((place, index) => index <=2)
-    })
-    computed_places.value = places_computed.value
-}
-
-watch(search_text, fetchPlaces)
-
 // gis
-const lnglat = ref([-0.02, 37.08])
-const zoom = ref(8)
-// const isPlaces = ref(false)//this determines whether the modal showing the places array is hidden or shown...a bit of an overkill but wth
-// const handleMouseEnter =(event, first, second) => {
-//     isIn.value = true
-//     console.log("its in")
-//     // search_text.value = first + " " + second
-//     const input = document.getElementById("location")
-//     input.innerText = first + " " + second
-// }
-// const handleMouseLeave = () => {
-//     isIn.value = false
-//     console.log(isIn.value, "left the place")
-// }
+const control = ref({
+    lat:-0.02985849,
+    lng:37.0854356,
+    zoom:6
+})
+
+const lnglat = ref(undefined)
+
 const handlePlaceSelect = (location) => {
     lnglat.value = location.center
-    search_text.value = ""
-    console.log(lnglat.value)
+    isWatching.value = false
+    search_text.value = location.place_name
 }
 // File upload
 const selectedImage = ref(null)

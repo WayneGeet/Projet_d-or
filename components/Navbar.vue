@@ -5,10 +5,10 @@
                 <li>
                     <NuxtLink to="/">LOGO</NuxtLink>
                 </li>
-                <li v-if="AuthStore.user" class="bg-red-400 text-white px-3 py-1 rounded-md">
+                <li v-if="!AuthStore.isAuthenticated" class="bg-red-400 text-white px-3 py-1 rounded-md">
                     <NuxtLink to="/accounts/register">Register</NuxtLink>
                 </li>
-                <li v-else-if="!AuthStore.user" @click="handleLogout" class="border border-blue-700 text-black px-3 py-1 rounded-md">
+                <li v-else-if="AuthStore.isAuthenticated" @click="handleLogout" class="border border-blue-700 text-black px-3 py-1 rounded-md">
                     <NuxtLink to="/accounts/login/">Logout</NuxtLink>
                 </li>
             </ul>
@@ -24,9 +24,9 @@ const data = AuthStore.isAuthenticated
 console.log(data)
 console.log(AuthStore.isAuthenticated, " this is from navbar")
 const handleLogout = async () => {
-    nuxtStorage.localStorage.setData("access", "")
-    nuxtStorage.localStorage.setData("refresh", "")
-    nuxtStorage.localStorage.setData("user", "")
+    console.log("logged out ran")
+    const data = await AuthStore.unAuthenticate()
+    console.log(data)
 }
 
 
