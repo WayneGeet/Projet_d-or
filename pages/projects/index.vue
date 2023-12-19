@@ -50,7 +50,7 @@ setInterval(async () => {
 })
     const message = data.value
     console.log(message, ' this is from the interceptor @index.vue')
-}, 100000)
+}, 10000)
 
 
 

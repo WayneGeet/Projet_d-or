@@ -103,6 +103,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+    middleware:"auth"
+})
 // const longitude = ref("")
 // const latitude = ref("")
 const selected_type = ref("Please select one")

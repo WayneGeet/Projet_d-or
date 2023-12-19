@@ -1,9 +1,13 @@
 import { useAuth } from "~/store/auth";
-export default defineNuxtRouteMiddleware((to, from) => {
+import { storeToRefs } from "pinia";
+export default defineNuxtRouteMiddleware(async (to, from) => {
   const AuthStore = useAuth();
-  if (AuthStore.isAuthenticated === false) {
-    console.log(AuthStore.isAuthenticated, " you are not registered");
+  const { user } = storeToRefs(AuthStore);
+
+  if (!user.value) {
+    console.log(user, "invalid auth from middleware");
     return navigateTo("/accounts/login/");
   } else {
+    console.log(user.value, "we good from middleware");
   }
 });

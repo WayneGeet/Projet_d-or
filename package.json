@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.5.1",
+    "mitt": "^3.0.1",
     "nuxt-gmaps": "^1.2.10",
     "nuxt-storage": "^1.2.2"
   }

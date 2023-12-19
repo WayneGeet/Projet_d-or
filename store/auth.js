@@ -2,12 +2,21 @@ import { defineStore } from "pinia";
 import nuxtStorage from "nuxt-storage";
 
 export const useAuth = defineStore("authentication", () => {
-  const access = ref(nuxtStorage.localStorage.getData("access") || "");
-  const refresh = ref(nuxtStorage.localStorage.getData("refresh") || "");
-  const user = ref(nuxtStorage.localStorage.getData("user") || "");
-  const isAuthenticated = computed(() => {
-    return user.value ? true : false;
-  });
+  const access = ref(
+    nuxtStorage.localStorage.getData("access")
+      ? nuxtStorage.localStorage.getData("access")
+      : null
+  );
+  const refresh = ref(
+    nuxtStorage.localStorage.getData("refresh")
+      ? nuxtStorage.localStorage.getData("refresh")
+      : null
+  );
+  const user = ref(
+    nuxtStorage.localStorage.getData("user")
+      ? nuxtStorage.localStorage.getData("user")
+      : null
+  );
 
   const setAuthentication = async ({ email, password }) => {
     const { data: tokens } = await useFetch("/api/auth/", {
@@ -23,11 +32,14 @@ export const useAuth = defineStore("authentication", () => {
         message: "fetching tokens has failed",
       });
     } else {
-      nuxtStorage.localStorage.setData("access", tokens.access);
-      nuxtStorage.localStorage.setData("refresh", tokens.refresh);
+      access.value = tokens.access;
+      refresh.value = tokens.refresh;
       const person = await getUser();
-      nuxtStorage.localStorage.setData("user", person.value);
-      navigateTo("/projects/");
+      user.value = await person.value.first_name;
+
+      nuxtStorage.localStorage.setData("user", person.value.first_name);
+      nuxtStorage.localStorage.setData("access", tokens.value.access);
+      nuxtStorage.localStorage.setData("refresh", tokens.value.refresh);
     }
   };
 
@@ -38,20 +50,20 @@ export const useAuth = defineStore("authentication", () => {
 
   const unAuthenticate = async () => {
     try {
-      localStorage.setItem("access", "");
-      localStorage.setItem("refresh", "");
-      access.value = "";
-      refresh.value = "";
-      return "success";
+      nuxtStorage.localStorage.clear();
+      access.value = null;
+      refresh.value = null;
+      user.value = null;
+
+      return { statusCode: 200 };
     } catch (error) {
-      return "failed";
+      console.log(error, " something went wrong while logging out");
     }
   };
 
   return {
     access,
     refresh,
-    isAuthenticated,
     user,
     setAuthentication,
     unAuthenticate,

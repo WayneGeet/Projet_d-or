@@ -19,21 +19,21 @@
 
 <script setup>
 definePageMeta({
-    layout:"start"
+    layout:"start",
 })
 import { useAuth } from '~/store/auth';
-import nuxtStorage from 'nuxt-storage';
 
+// const {$bus} = useNuxtApp()
 const authStore = useAuth()
 
 const email = ref("michaelscott@gmail.com")
 const password = ref("dundermifflin001")
-// const runTimeConfig = useRuntimeConfig()
+
 async function login() {
     await authStore.setAuthentication({email:email.value, password:password.value})
     await navigateTo("/projects/")
+    // $bus.$emit("auth-event", isAuthenticated)
 }    
-console.log(authStore.user)
 
 // nuxtStorage.localStorage.setData('access_token1', );
 

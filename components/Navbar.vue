@@ -5,10 +5,10 @@
                 <li>
                     <NuxtLink to="/">LOGO</NuxtLink>
                 </li>
-                <li v-if="!AuthStore.isAuthenticated" class="bg-red-400 text-white px-3 py-1 rounded-md">
+                <li v-if="!user" class="bg-red-400 text-white px-3 py-1 rounded-md">
                     <NuxtLink to="/accounts/register">Register</NuxtLink>
                 </li>
-                <li v-else-if="AuthStore.isAuthenticated" @click="handleLogout" class="border border-blue-700 text-black px-3 py-1 rounded-md">
+                <li v-else @click="handleLogout" class="border border-blue-700 text-black px-3 py-1 rounded-md">
                     <NuxtLink to="/accounts/login/">Logout</NuxtLink>
                 </li>
             </ul>
@@ -17,16 +17,22 @@
 </template>
 
 <script setup>
-import nuxtStorage from "nuxt-storage"
 import {useAuth} from "~/store/auth.js"
+import { storeToRefs } from "pinia";
+
 const AuthStore = useAuth()
-const data = AuthStore.isAuthenticated
-console.log(data)
-console.log(AuthStore.isAuthenticated, " this is from navbar")
+AuthStore.$subscribe(()=> console.log(event))
+const {user} = storeToRefs(AuthStore)
+
+console.log(user.value, " from navbar")
+
+watch(() => user, () => {
+    console.log(user.value, "user has changed do something!")
+} )
+
 const handleLogout = async () => {
-    console.log("logged out ran")
-    const data = await AuthStore.unAuthenticate()
-    console.log(data)
+    await AuthStore.unAuthenticate()
+    await navigateTo("/accounts/login/")
 }
 
 

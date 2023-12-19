@@ -24,6 +24,9 @@ export default defineNuxtConfig({
       global: true,
       dirs: ['~/components']
         },
+  plugins: [
+    "~/plugins/mitt.client.js"
+  ],
   ssr:false
 
  
