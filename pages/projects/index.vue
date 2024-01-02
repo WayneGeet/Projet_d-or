@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p>Welcome {{ user.first_name }}</p>
+        <p>Welcome {{ user }}</p>
         <div v-if="projects">
             <section class="" v-for="project in projects" :key="project.id">
                 <h2 class="">{{ project.properties.name }}</h2>
@@ -27,8 +27,7 @@ const projects = ref(null)
 const user = ref({})
 
 onMounted(async ()=> {
-    const person = await authStore.getUser()
-    user.value = await person.value
+    user.value = await authStore.user
     const data = await ProjectStore.getProjects()
     const prjs = data.value
     projects.value = prjs.features
@@ -36,23 +35,6 @@ onMounted(async ()=> {
     authStore.$subscribe((cb) => console.log(cb.events, " this is from authStore subscriber"))
 
 })
-
-
-setInterval(async () => {
-    const {data} = await useFetch("/api/refresh/", {
-  async onResponseError({ request, response, options }) {
-    // Log error
-    console.log(
-      "[fetch response error]",
-      request,
-      response.status    );
-  },
-})
-    const message = data.value
-    console.log(message, ' this is from the interceptor @index.vue')
-}, 10000)
-
-
 
 // projects.value = prjs.features
 

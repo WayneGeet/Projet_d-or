@@ -1,15 +1,23 @@
 <template>
     <section>
         <nav class="w-full bg-neutral-100 gap-4 px-4 py-2">
-            <ul class="flex justify-between items-center">
+            <ul class="menu">
                 <li>
                     <NuxtLink to="/">LOGO</NuxtLink>
                 </li>
-                <li v-if="!user" class="bg-red-400 text-white px-3 py-1 rounded-md">
+                <li v-if="!user" class="">
                     <NuxtLink to="/accounts/register">Register</NuxtLink>
                 </li>
-                <li v-else @click="handleLogout" class="border border-blue-700 text-black px-3 py-1 rounded-md">
+                <li v-else @click="handleLogout" class="">
                     <NuxtLink to="/accounts/login/">Logout</NuxtLink>
+                </li>
+                <li>
+                    <NuxtLink>Frameworks</NuxtLink>
+                    <ul class="submenu">
+                        <li><NuxtLink>React</NuxtLink></li>
+                        <li><NuxtLink>Nuxt</NuxtLink></li>
+                        <li><NuxtLink>Django</NuxtLink></li>
+                    </ul>
                 </li>
             </ul>
         </nav>
@@ -37,3 +45,16 @@ const handleLogout = async () => {
 
 
 </script>
+
+<style scoped>
+ul {
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+nav {
+    width:100%;
+    box-shadow:0 0 10px rgb(0 0 0 / 8%);
+}
+
+</style>

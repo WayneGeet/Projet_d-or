@@ -104,7 +104,6 @@
 
 <script setup>
 definePageMeta({
-    middleware:"auth"
 })
 // const longitude = ref("")
 // const latitude = ref("")
