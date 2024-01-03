@@ -57,9 +57,7 @@ export const useAuth = defineStore("authentication", () => {
       user.value = null;
 
       return { statusCode: 200 };
-    } catch (error) {
-      console.log(error, " something went wrong while logging out");
-    }
+    } catch (error) {}
   };
 
   const updateTokens = async () => {
@@ -73,9 +71,7 @@ export const useAuth = defineStore("authentication", () => {
           },
         }
       );
-      console.log(data);
       const tokens = await data.value;
-      console.log(tokens.value, "this is from project store");
       return tokens;
     }
   };

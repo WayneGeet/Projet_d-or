@@ -1,5 +1,6 @@
 export default defineEventHandler(async (event) => {
-  const refr = await useStorage().getItem("refresh");
+  const { refresh: refr } = await readBody(event);
+  console.log(refr, " this is refresh token");
   const response = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
     method: "post",
     headers: {
@@ -10,10 +11,13 @@ export default defineEventHandler(async (event) => {
     }),
   });
   if (!response.ok) {
-    return { message: "Refresh refused to refresh", statusCode: 400 };
+    throw createError({
+      statusCode: 400,
+      statusMessage: "something went wrong!",
+    });
   }
   const { access, refresh } = await response.json();
   await useStorage().setItem("access", access);
   await useStorage().setItem("refresh", refresh);
-  return { message: "success", statusCode: 200 };
+  return { access, refresh };
 });

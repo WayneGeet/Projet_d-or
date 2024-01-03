@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.5.1",
+    "jwt-decode": "^4.0.0",
     "mitt": "^3.0.1",
     "nuxt-gmaps": "^1.2.10",
     "nuxt-storage": "^1.2.2"

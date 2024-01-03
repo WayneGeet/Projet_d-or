@@ -1,20 +1,17 @@
 export default defineEventHandler(async (event) => {
   try {
-    const access = await useStorage().getItem("access");
+    const token = getRequestHeader(event, "authorization");
     const response = await fetch("http://127.0.0.1:8000/projects/", {
       method: "get",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${access}`,
+        Authorization: token,
       },
     });
     if (!response.ok) {
-      // await useStorage().setItem("access", "");
-      // await useStorage().setItem("refresh", "");
-      // await useStorage().setItem("user", "");
-      // await useStorage().clear();
+      setResponseStatus(event, 408);
       throw createError({
-        statusCode: 401,
+        statusCode: 408,
         statusMessage: "unauthorized access",
       });
     } else {
@@ -23,7 +20,7 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error) {
     throw createError({
-      statusCode: 401,
+      statusCode: 408,
       statusMessage: "unauthorized access",
     });
   }
