@@ -5,8 +5,8 @@
                 <li>
                     <NuxtLink to="/">LOGO</NuxtLink>
                 </li>
-                <li v-if="!user" class="">
-                    <NuxtLink to="/accounts/register">Register</NuxtLink>
+                <li v-if="!access" class="">
+                    <NuxtLink to="#">Register</NuxtLink>
                 </li>
                 <li v-else @click="handleLogout" class="">
                     <NuxtLink to="/accounts/login/">Logout</NuxtLink>
@@ -14,9 +14,9 @@
                 <li>
                     <NuxtLink>Frameworks</NuxtLink>
                     <ul class="submenu">
-                        <li><NuxtLink>React</NuxtLink></li>
+                        <!-- <li><NuxtLink>React</NuxtLink></li>
                         <li><NuxtLink>Nuxt</NuxtLink></li>
-                        <li><NuxtLink>Django</NuxtLink></li>
+                        <li><NuxtLink>Django</NuxtLink></li> -->
                     </ul>
                 </li>
             </ul>
@@ -29,14 +29,13 @@ import {useAuth} from "~/store/auth.js"
 import { storeToRefs } from "pinia";
 
 const AuthStore = useAuth()
-AuthStore.$subscribe(()=> console.log(event))
-const {user} = storeToRefs(AuthStore)
+AuthStore.$subscribe((event)=> console.log(event))
+const {access} = storeToRefs(AuthStore)
 
-console.log(user.value, " from navbar")
 
-watch(() => user, () => {
-    console.log(user.value, "user has changed do something!")
-} )
+// watch(() => user, () => {
+//     console.log(user.value, "user has changed do something!")
+// } )
 
 const handleLogout = async () => {
     await AuthStore.unAuthenticate()

@@ -5,67 +5,61 @@ import nuxtStorage from "nuxt-storage";
 
 export const useProjects = defineStore("projects", () => {
   const authStore = useAuth();
+  authStore.$subscribe(({ state, mutations }) => console.log(state));
   const projects = ref(null);
 
   const dayjs = useDayjs();
 
-  // computed properties
-  const tokens = computed(() => {
-    const authStoreAccess =
-      authStore.access || nuxtStorage.localStorage.getData("access");
-
-    const authStoreRefresh =
-      authStore.refresh || nuxtStorage.localStorage.getData("refresh");
-    return { access: authStoreAccess, refresh: authStoreRefresh };
-  });
   const getProjects = async () => {
+    const accessToken = authStore.access;
+    const refreshToken = authStore.refresh;
+
     const { data, error } = await useFetch("/api/projects/", {
-      retry: 3,
-      retryDelay: 500,
-      timeout: 3000,
       headers: {
         Accept: "application/json",
-        "Cache-Control": "no-cache",
-        Authorization: `Bearer ${tokens.value.access}`,
+        Authorization: `Bearer ${accessToken}`,
       },
       async onRequest({ request, options }) {
-        console.log(authStore.access, " this is options");
-        // options.headers.authorization = `Bearer ${authStore.access}`;
-      },
-      async onResponseError({ request, response, options }) {
-        // Handle the response errors
-        // if (response.status === 401) {
-        const { data, error } = await useFetch("/api/refresh/", {
-          method: "post",
-          body: { refresh: tokens.value.refresh },
-        });
-        console.log(
-          authStore.access,
-          "this is from response error interceptorsss"
+        // retrieve the expiration time of the token
+        const expirationTime = ref(
+          jwtDecode(nuxtStorage.localStorage.getData("access")).exp
         );
-        authStore.access =
-          data.value.access || nuxtStorage.localStorage.getData("access");
-        error.value &&
-          console.log("something went wrong while refreshing tokens");
+        // check to see if the token has expired
+        const isExpired = ref(
+          dayjs.unix(expirationTime.value).diff(dayjs()) < 1
+        );
+        console.log(
+          dayjs.unix(expirationTime.value).diff(dayjs()),
+          "expiration time"
+        );
 
-        // }
-      },
-      async onRequest({ request, options }) {
-        console.log("Request has been made");
-        const expirationTime = jwtDecode(
-          nuxtStorage.localStorage.getData("access")
-        ).exp;
-        const isExpired = dayjs.unix(expirationTime).diff(dayjs()) < 1;
-        if (!isExpired) return request;
-        const { data } = await useFetch("/api/refresh/");
-        options.headers.authorization = `Bearer ${authStore.access}`;
+        if (!isExpired.value) return request;
+        else {
+          const { data } = await useFetch(
+            "http://127.0.0.1:8000/api/token/refresh/",
+            {
+              method: "post",
+              body: {
+                refresh: refreshToken,
+              },
+            }
+          );
+          const token = await data.value;
+
+          console.log(token.access, "this is access from refresh");
+
+          nuxtStorage.localStorage.setData("access", token.access);
+          authStore.access = ref(nuxtStorage.localStorage.getData("access"));
+          options.headers.Authorization = `Bearer ${token.access}`;
+          console.log(request, options.headers.Authorization);
+          // options.headers.authorization = `Bearer ${token.value}`;
+        }
       },
     });
     if (error.value) {
-      authStore.access = null;
-      authStore.refresh = null;
-      authStore.user = null;
-      localStorage.clear();
+      // authStore.access = null;
+      // authStore.refresh = null;
+      // localStorage.clear();
       console.log(error.value + " this is from project store");
     }
     projects.value = data.value;

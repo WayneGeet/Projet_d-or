@@ -1,6 +1,7 @@
 export default defineEventHandler(async (event) => {
   try {
     const token = getRequestHeader(event, "authorization");
+    console.log(token, " this is the bearer token");
     const response = await fetch("http://127.0.0.1:8000/projects/", {
       method: "get",
       headers: {
@@ -9,7 +10,7 @@ export default defineEventHandler(async (event) => {
       },
     });
     if (!response.ok) {
-      setResponseStatus(event, 408);
+      setResponseStatus(event, 401);
       throw createError({
         statusCode: 408,
         statusMessage: "unauthorized access",
@@ -20,8 +21,8 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error) {
     throw createError({
-      statusCode: 408,
-      statusMessage: "unauthorized access",
+      statusCode: 500,
+      statusMessage: "check the server",
     });
   }
 });
