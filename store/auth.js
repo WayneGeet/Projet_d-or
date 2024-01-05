@@ -26,8 +26,13 @@ export const useAuth = defineStore("authentication", () => {
       access.value = tokens.value.access;
       refresh.value = tokens.value.refresh;
 
-      nuxtStorage.localStorage.setData("access", tokens.value.access);
-      nuxtStorage.localStorage.setData("refresh", tokens.value.refresh);
+      nuxtStorage.localStorage.setData("access", tokens.value.access, 1, "d");
+      nuxtStorage.localStorage.setData(
+        "refresh",
+        tokens.value.refresh,
+        15,
+        "d"
+      );
     }
   };
 

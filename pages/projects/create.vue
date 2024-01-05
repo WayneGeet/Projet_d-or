@@ -1,6 +1,6 @@
 <template>
     <div class="bg-slate-200 min-h-screen flex items-center">
-        <form method="POST" @submit.prevent="handleSubmit" class="max-w-lg mx-auto rounded-lg relative bg-gray-300 w-full px-20 py-10">
+        <form method="POST" enctype="multipart/form-data" @submit.prevent="handleSubmit" class="max-w-lg mx-auto rounded-lg relative bg-gray-300 w-full px-20 py-10">
             <div class="">
                 <label for="project_name">Project Name</label>
                 <input type="text" name="project_name" id="project_name" v-model="project_name">
@@ -24,7 +24,7 @@
 
             <div class="">
                 <label for="locate">Upload Photo</label>
-                <input type="file" @change="handleImageUpload" name="" id="">
+                <input type="file" @change="handleImageUpload" accept=".jpeg, .jpg, .png" name="" id="">
             </div>
             <div class="">
                 <label class="flex items-center gap-4" for="locate"><span>
@@ -104,7 +104,10 @@
 
 <script setup>
 definePageMeta({
+    middleware:"auth"
 })
+import {useProjects} from "~/store/project";
+const ProjectStore = useProjects();
 // const longitude = ref("")
 // const latitude = ref("")
 const selected_type = ref("Please select one")
@@ -155,6 +158,7 @@ const lnglat = ref(undefined)
 
 const handlePlaceSelect = (location) => {
     lnglat.value = location.center
+    console.log(lnglat.value)
     isWatching.value = false
     search_text.value = location.place_name
 }
@@ -166,22 +170,16 @@ const handleImageUpload = (event) => {
 
 const handleSubmit = async () => {
     const fd = new FormData()
-    fd.append("photo", selectedImage.value, selectedImage.value.name)
+    fd.append("photo", selectedImage.value)
     fd.append("location", JSON.stringify({ type: "Point", coordinates: [37.024, -0.123] }));
     fd.append("budget", budget.value);
     fd.append("name", project_name.value);
     fd.append("project_type", selected_type.value);
-    console.log(fd)
-    const {data, error, pending} = await useFetch("http://127.0.0.1:8000/projects/",{
-        method:"POST",
-        headers:{
-            "Content-Type":"multipart/form-data",
-            
-        },
-        body:fd
-    })
-    const response = await data.value
-    console.log(response)
+    console.log(fd.values(), " this is what is going to the backend")
+
+    const {msg} = await ProjectStore.postProject(fd)   
+    console.log(msg) 
+    navigateTo("/projects/")
 }
 
 
