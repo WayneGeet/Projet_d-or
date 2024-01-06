@@ -1,8 +1,7 @@
 <template>  
     <div class="w-[100%] h-[80vh] relative">
       <MapboxMap
-        ref="mapRef"
-        map-id="map1"
+        map-id="projects"
         style=props.style
         :options="{
             style: 'mapbox://styles/wayne-geet/clk9alnap00oh01qy18um4etm',
@@ -19,6 +18,15 @@
 
 <script setup>
     const props = defineProps(['control', 'style', 'width', 'height'])
+    onMounted(() => {
+      const mapRef = useMapboxRef('projects')
+      console.log(mapRef.value)
+      const mapStyle = computed(() => {
+        return mapRef.value?.getStyle();
+      });
+      console.log(mapStyle, " this is the mapstyle")
+      })
+    
 </script>
 
 <style scoped>

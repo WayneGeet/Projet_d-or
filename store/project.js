@@ -41,7 +41,6 @@ export const useProjects = defineStore("projects", () => {
             }
           );
           const token = await data.value;
-          console.log(token, " tokne");
 
           nuxtStorage.localStorage.setData("access", token.access, 1, "d");
           nuxtStorage.localStorage.setData("refresh", token.refresh, 15, "d");
