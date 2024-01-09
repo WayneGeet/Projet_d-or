@@ -37,7 +37,7 @@
         <div v-if="showDialog" class="px-7 py-4 rounded-md absolute min-w-6xl bg-white top-0 z-10 overflow-hidden w-3/4">
             
             <!-- Body -->
-            <article v-if="!showMap" class="min-w-6xl gap-10 " :class="{ 'grid grid-cols-2 gap-4': !showMap, '': showMap }">
+            <article v-if="!showMap" class="min-w-6xl gap-10 " :class="{'grid grid-cols-2 gap-4': !showMap, '': showMap }">
                 <section class="w-full ">
                     <!-- heading -->
                     <div class="flex items-center mb-5">
@@ -82,7 +82,9 @@
 
                 <section class="aspect-video overflow-hidden top-1/2">
                     <!-- <img class="object-cover aspect-video" src="~/assets/images/location.jpg" alt="location" /> -->
-                    <Mapbox title="Welcome to Map View" :control="control" style="position: absolute; top: 0; bottom: 0;"></Mapbox>
+                    <Mapbox title="Welcome to Map View" :control="control" style="position: absolute; top: 0; bottom:0;" mapId='map2'>
+                        
+                    </Mapbox>
                 </section>
 
                 <!-- <article v-if="showMap">
@@ -181,9 +183,6 @@ const handleSubmit = async () => {
     console.log(msg) 
     navigateTo("/projects/")
 }
-
-
-
 
 </script>
 

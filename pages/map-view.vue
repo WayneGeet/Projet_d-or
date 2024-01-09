@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Mapbox title="Welcome to Map View" :control="control" style="position: relative; top: 0; bottom: 0;">
+        <Mapbox title="Welcome to Map View" :control="control" style="position: relative; top: 0; bottom: 0;" mapId="projects">
           <!-- <div class="flex flex-col text-2xl text-black absolute top-0 right-5 z-20 text-center items-center justify-center">
           <div @click="() => zoomControl('add')" class="hover:bg-gray-100 cursor-pointer font-bold w-5 h-5 border bg-white p-3 text-center mb-1 flex justify-center items-center">
             <p><IconesAdd/></p>
@@ -12,18 +12,23 @@
 
           <article v-for="location in locations" :key="location.id">
               <MapboxDefaultMarker
-                :options="{draggable:true, color:'red', 
-                }"
+                :options="{color:`${() => setMarkerColor(location)}`}"
                 :marker-id="location.id.toString()"
-                :lnglat="{lng:location.geometry.coordinates[0], lat:location.geometry.coordinates[1]}"
-                @dragend="() => { console.log('dragend') }"
+                :lnglat="[location.geometry.coordinates[0], location.geometry.coordinates[1]]"
               >
-                <template #marker>
-                  <div @click="showAlert">
-                    <img src="~/assets/images/hospital.png" :alt="location.id">
-                  </div>
-                </template>
-              </MapboxDefaultMarker>             
+              </MapboxDefaultMarker>
+
+              <MapboxDefaultPopup
+                :popup-id="location.id.toString()"
+                :lnglat="[location.geometry.coordinates[0], location.geometry.coordinates[1]]"
+                :options="{
+                  closeOnClick:true
+                }"
+              >
+                <h1 class="test">
+                  Hello World!
+                </h1>
+              </MapboxDefaultPopup>
 
         </article>
         </Mapbox> 
@@ -38,13 +43,23 @@ import { useProjects } from "~/store/project"
   onMounted(async () => {
       const projects = await ProjectStore.getProjects()
       const prjs = projects.value
-      locations.value = prjs.features
+      locations.value = prjs.features //GIS
+      properties.value = prjs.features.properties //data description
   })    
+  
   const showAlert = () =>{
     console.log("marker has been clicked")
   }
+  // set marker color
+  function setMarkerColor(location){
+      if(location.features.properties.phase === "planning") return "red"
+      else if(location.features.properties.phase === "execution") return "purple"
+      else if(location.features.properties.phase === "initial") return "orange"
+      else if(location.features.properties.phase === "closing") return "black"
+  }
   const ProjectStore = useProjects()
   const locations = ref(null)
+  const properties = ref(null)
   const control = ref({
     lng:37.9098765789,
     lat:0.0234567658,
