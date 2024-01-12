@@ -1,14 +1,25 @@
 export default defineEventHandler(async (event) => {
+  const url = getRequestURL(event);
+  const pn = url.pathname.split("/");
+  console.log(pn);
+
   try {
     const token = getRequestHeader(event, "authorization");
-    console.log(token, " this is the bearer token");
-    const response = await fetch("http://127.0.0.1:8000/projects/", {
-      method: "get",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-      },
-    });
+
+    const response = await fetch(
+      `${
+        pn[3]
+          ? `http://127.0.0.1:8000/projects/${pn[3]}`
+          : "http://127.0.0.1:8000/projects/"
+      }`,
+      {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
     if (!response.ok) {
       setResponseStatus(event, 401);
       throw createError({

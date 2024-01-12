@@ -1,6 +1,5 @@
 export default defineEventHandler(async (event) => {
   const { refresh: refr } = await readBody(event);
-  console.log(refr, " refresh accessed from readbody");
   const response = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
     method: "post",
     headers: {
@@ -16,8 +15,8 @@ export default defineEventHandler(async (event) => {
       statusMessage: "something went wrong!",
     });
   }
-  const { access } = await response.json();
+  const { access, refresh } = await response.json();
   // await useStorage().setItem("access", access);
   // await useStorage().setItem("refresh", access);
-  return access;
+  return { access, refresh };
 });

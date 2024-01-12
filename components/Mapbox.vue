@@ -11,13 +11,6 @@
         @click="mapClick"
       >
         <MapboxGeolocateControl position="top-left" />
-        <MapboxDefaultMarker
-        marker-id="marker1"
-        :lnglat="[37, -0.02]"
-        :options="{ }"
-        >
-          
-        </MapboxDefaultMarker>
         <slot></slot>
       </MapboxMap> 
 

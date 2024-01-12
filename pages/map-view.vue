@@ -16,19 +16,31 @@
                 :marker-id="location.id.toString()"
                 :lnglat="[location.geometry.coordinates[0], location.geometry.coordinates[1]]"
               >
-              </MapboxDefaultMarker>
-
               <MapboxDefaultPopup
                 :popup-id="location.id.toString()"
                 :lnglat="[location.geometry.coordinates[0], location.geometry.coordinates[1]]"
                 :options="{
-                  closeOnClick:true
+                  closeOnClick:true,
+                  className:'popup',
+                  maxWidth:'300px'
                 }"
               >
-                <h1 class="test">
-                  Hello World!
-                </h1>
+                <div class="rounded-md border border-sky-400 overflow-y-auto">
+                  {{ console.log(popupImage(location)) }}
+                  <img class="max-w-[200px] h-[150px] object-contain mx-auto px-2 pb-3" :src="popupImage(location)" :alt="'image of '+ location.properties.name">
+                  <div class="px-3">
+                    <p class="whitespace-nowrap">{{ location.properties.name }}</p>
+                    <p>{{ location.properties.budget }}</p>
+                    <p>{{ location.properties.phase }}</p>
+                  </div>
+                  <button>
+                    <NuxtLink to=""></NuxtLink>
+                  </button>
+                </div>
               </MapboxDefaultPopup>
+              </MapboxDefaultMarker>
+
+              
 
         </article>
         </Mapbox> 
@@ -45,6 +57,7 @@ import { useProjects } from "~/store/project"
       const prjs = projects.value
       locations.value = prjs.features //GIS
       properties.value = prjs.features.properties //data description
+      console.log(locations.value)
   })    
   
   const showAlert = () =>{
@@ -56,6 +69,12 @@ import { useProjects } from "~/store/project"
       else if(location.features.properties.phase === "execution") return "purple"
       else if(location.features.properties.phase === "initial") return "orange"
       else if(location.features.properties.phase === "closing") return "black"
+  }
+  const popupImage = (location) => {
+    if(!location.properties.photo){
+      return "~/assets/images/shop.png"
+    }
+    else return location.properties.photo
   }
   const ProjectStore = useProjects()
   const locations = ref(null)
@@ -81,6 +100,11 @@ import { useProjects } from "~/store/project"
 </script>
 
 <style scoped>
+.popup{
+  max-width:5rem;
+  overflow:scroll;
+  height:7rem;
 
+}
 
 </style>
