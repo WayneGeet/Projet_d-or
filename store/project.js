@@ -5,7 +5,7 @@ import { getData, setData } from "nuxt-storage/local-storage";
 
 export const useProjects = defineStore("projects", () => {
   const authStore = useAuth();
-  // authStore.$subscribe(({ state, mutations }) => console.log(state));
+  authStore.$subscribe(({ state, mutations }) => console.log(state));
   const projects = ref(null);
 
   const dayjs = useDayjs();
@@ -35,18 +35,13 @@ export const useProjects = defineStore("projects", () => {
     const accessToken = authStore.access;
 
     const { data, error } = await useFetch("/api/projects/", {
+      cache: false,
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
       async onRequest({ request, options }) {
-        // retrieve the expiration time of the token
-        const expirationTime = ref(jwtDecode(getData("access")).exp);
-        // check to see if the token has expired
-        const isExpired = ref(
-          dayjs.unix(expirationTime.value).diff(dayjs()) < 1
-        );
-        console.log(hasexp().value);
+        console.log(options, "getprojects options has been ran");
         if (!hasexp().value) return request;
         else {
           const token = await updateToken();
@@ -66,6 +61,7 @@ export const useProjects = defineStore("projects", () => {
     projects.value = data.value;
     return data;
   };
+
   const getProject = async (id) => {
     const accessToken = authStore.access;
 
@@ -75,13 +71,11 @@ export const useProjects = defineStore("projects", () => {
         Authorization: `Bearer ${accessToken}`,
       },
       async onRequest({ request, options }) {
+        console.log(options, "getproject options has been ran");
         if (!hasexp().value) return request;
         else {
           const token = await updateToken();
-          console.log(token, "this is token from update function");
-
           options.headers.Authorization = `Bearer ${token.access}`;
-          // checking if the local storage has expired
         }
       },
     });
@@ -98,48 +92,40 @@ export const useProjects = defineStore("projects", () => {
   const postProject = async (formData) => {
     const accessToken = authStore.access;
     const refreshToken = authStore.refresh;
-    const {
-      data: message,
-      error,
-      pending,
-    } = await useLazyFetch("http://127.0.0.1:8000/projects/", {
-      method: "post",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: formData,
-      async onRequest({ request, options }) {
-        // retrieve the expiration time of the token
-        const expirationTime = ref(
-          jwtDecode(nuxtStorage.localStorage.getData("access")).exp
-        );
-        // check to see if the token has expired
-        const isExpired = ref(
-          dayjs.unix(expirationTime.value).diff(dayjs()) < 1
-        );
+    const { data: message, error } = await useLazyFetch(
+      "http://127.0.0.1:8000/projects/",
+      {
+        method: "post",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+        async onRequest({ request, options }) {
+          if (!hasexp().value) return request;
+          else {
+            const { data } = await useFetch(
+              "http://127.0.0.1:8000/api/token/refresh/",
+              {
+                method: "post",
+                body: {
+                  refresh: refreshToken,
+                },
+              }
+            );
+            const token = await data.value;
 
-        if (!isExpired.value) return request;
-        else {
-          const { data } = await useFetch(
-            "http://127.0.0.1:8000/api/token/refresh/",
-            {
-              method: "post",
-              body: {
-                refresh: refreshToken,
-              },
-            }
-          );
-          const token = await data.value;
-
-          setData("access", token.access, 1, "d");
-          setData("refresh", token.refresh, 15, "d");
-          authStore.access = ref(nuxtStorage.localStorage.getData("access"));
-          authStore.refresh = ref(nuxtStorage.localStorage.getData("refresh"));
-          options.headers.Authorization = `Bearer ${token.access}`;
-          // checking if the local storage has expired
-        }
-      },
-    });
+            setData("access", token.access, 1, "d");
+            setData("refresh", token.refresh, 15, "d");
+            authStore.access = ref(nuxtStorage.localStorage.getData("access"));
+            authStore.refresh = ref(
+              nuxtStorage.localStorage.getData("refresh")
+            );
+            options.headers.Authorization = `Bearer ${token.access}`;
+            // checking if the local storage has expired
+          }
+        },
+      }
+    );
 
     if (error.value)
       throw createError({
@@ -148,5 +134,30 @@ export const useProjects = defineStore("projects", () => {
       });
     return message.value;
   };
-  return { getProjects, getProject, projects, postProject };
+
+  const likeFn = async (id) => {
+    const accessToken = authStore.access;
+    const { data, error } = await useFetch(
+      `http://127.0.0.1:8000/projects/${id}/like/`,
+      {
+        method: "post",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        async onRequest({ request, options }) {
+          console.log(options, "getproject options has been ran");
+          if (!hasexp().value) return request;
+          else {
+            const token = await updateToken();
+            options.headers.Authorization = `Bearer ${token.access}`;
+          }
+        },
+      }
+    );
+    const response = data.value;
+    if (response) return data;
+    else throw createError({ statusCode: 400, statusMessage: error.value });
+  };
+  return { getProjects, getProject, projects, postProject, likeFn };
 });
