@@ -94,23 +94,7 @@ export const useProjects = defineStore("projects", () => {
         async onRequest({ request, options }) {
           if (!hasexp().value) return request;
           else {
-            const { data } = await useFetch(
-              "http://127.0.0.1:8000/api/token/refresh/",
-              {
-                method: "post",
-                body: {
-                  refresh: refreshToken,
-                },
-              }
-            );
-            const token = await data.value;
-
-            setData("access", token.access, 1, "d");
-            setData("refresh", token.refresh, 15, "d");
-            authStore.access = ref(nuxtStorage.localStorage.getData("access"));
-            authStore.refresh = ref(
-              nuxtStorage.localStorage.getData("refresh")
-            );
+            const token = await updateToken();
             options.headers.Authorization = `Bearer ${token.access}`;
             // checking if the local storage has expired
           }
@@ -148,5 +132,49 @@ export const useProjects = defineStore("projects", () => {
     if (response) return data;
     else throw createError({ statusCode: 400, statusMessage: error.value });
   };
-  return { getProjects, getProject, projects, postProject, likeFn };
+
+  const setProfile = async ({ phone_number, county, photo }) => {
+    const { data, error } = await useFetch("/api/profile", {
+      method: "post",
+      body: { photo, phone_number, county },
+      headers: {
+        Authorization: `Bearer ${accessandrefresh().access}`,
+      },
+      async onRequest({ request, options }) {
+        if (!hasexp().value) return request;
+        else {
+          const token = await updateToken();
+          options.headers.Authorization = `Bearer ${token.access}`;
+          // checking if the local storage has expired
+        }
+      },
+    });
+    if (data.value) return data;
+    else console.log(error.value);
+  };
+
+  const getProfile = async (id) => {
+    const { data, error } = await useFetch(`/api//${id}`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${accessandrefresh().access}`,
+      },
+      async onRequest({ request, options }) {
+        if (!hasexp().value) return request;
+        else {
+          const token = await updateToken();
+          options.headers.Authorization = `Bearer ${token.access}`;
+        }
+      },
+    });
+    if (error.value) {
+      authStore.access = null;
+      authStore.refresh = null;
+      localStorage.clear();
+      console.log(error.value + " this is from project store");
+    }
+    projects.value = data.value;
+    return data;
+  };
+  return { getProjects, getProject, projects, postProject, likeFn, setProfile };
 });

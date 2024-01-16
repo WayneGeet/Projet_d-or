@@ -6,6 +6,14 @@ export const useAuth = defineStore("authentication", () => {
   const refresh = ref(nuxtStorage.localStorage.getData("refresh"));
 
   // const loading = ref(false);
+  const registration = async ({ fname, lname, email, id_no, password }) => {
+    const { data, error } = await useFetch("/api/register", {
+      method: "post",
+      body: { fname, lname, email, id_no, password },
+    });
+    if (data.value) return data;
+    else console.log(error.value);
+  };
 
   const setAuthentication = async ({ email, password }) => {
     const { data: tokens } = await useFetch("/api/auth/", {
@@ -51,5 +59,6 @@ export const useAuth = defineStore("authentication", () => {
     refresh,
     setAuthentication,
     unAuthenticate,
+    registration,
   };
 });

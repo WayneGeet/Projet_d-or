@@ -27,6 +27,9 @@ export default defineNuxtConfig({
   plugins: [
     "~/plugins/mitt.client.js"
   ],
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' }
+  },
   ssr:false
 
  
