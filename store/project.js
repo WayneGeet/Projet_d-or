@@ -5,14 +5,16 @@ import { getData, setData } from "nuxt-storage/local-storage";
 
 export const useProjects = defineStore("projects", () => {
   const authStore = useAuth();
-  authStore.$subscribe(({ state, mutations }) => console.log(state));
+  authStore.$subscribe((event) => console.log("subscribe is working"));
   const projects = ref(null);
-
   const dayjs = useDayjs();
 
+  const accessandrefresh = () => {
+    return { access: authStore.access, refresh: authStore.refresh };
+  };
+
   const hasexp = () => {
-    const accessToken = authStore.access;
-    const expirationTime = ref(jwtDecode(getData("access")).exp);
+    const expirationTime = ref(jwtDecode(accessandrefresh().access).exp);
     const isExpired = ref(dayjs.unix(expirationTime.value).diff(dayjs()) < 1);
     return isExpired;
   };
@@ -32,46 +34,37 @@ export const useProjects = defineStore("projects", () => {
   };
 
   const getProjects = async () => {
-    const accessToken = authStore.access;
-
     const { data, error } = await useFetch("/api/projects/", {
       cache: false,
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessandrefresh().access}`,
       },
       async onRequest({ request, options }) {
-        console.log(options, "getprojects options has been ran");
         if (!hasexp().value) return request;
         else {
           const token = await updateToken();
-          console.log(token, "this is token from update function");
-
           options.headers.Authorization = `Bearer ${token.access}`;
           // checking if the local storage has expired
         }
       },
     });
     if (error.value) {
-      // authStore.access = null;
-      // authStore.refresh = null;
-      // localStorage.clear();
-      console.log(error.value + " this is from project store");
+      authStore.access = null;
+      authStore.refresh = null;
+      localStorage.clear();
     }
     projects.value = data.value;
     return data;
   };
 
   const getProject = async (id) => {
-    const accessToken = authStore.access;
-
     const { data, error } = await useFetch(`/api/projects/${id}`, {
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessandrefresh().access}`,
       },
       async onRequest({ request, options }) {
-        console.log(options, "getproject options has been ran");
         if (!hasexp().value) return request;
         else {
           const token = await updateToken();
@@ -80,9 +73,9 @@ export const useProjects = defineStore("projects", () => {
       },
     });
     if (error.value) {
-      // authStore.access = null;
-      // authStore.refresh = null;
-      // localStorage.clear();
+      authStore.access = null;
+      authStore.refresh = null;
+      localStorage.clear();
       console.log(error.value + " this is from project store");
     }
     projects.value = data.value;
@@ -90,14 +83,12 @@ export const useProjects = defineStore("projects", () => {
   };
 
   const postProject = async (formData) => {
-    const accessToken = authStore.access;
-    const refreshToken = authStore.refresh;
     const { data: message, error } = await useLazyFetch(
       "http://127.0.0.1:8000/projects/",
       {
         method: "post",
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessandrefresh().access}`,
         },
         body: formData,
         async onRequest({ request, options }) {
@@ -136,17 +127,15 @@ export const useProjects = defineStore("projects", () => {
   };
 
   const likeFn = async (id) => {
-    const accessToken = authStore.access;
     const { data, error } = await useFetch(
       `http://127.0.0.1:8000/projects/${id}/like/`,
       {
         method: "post",
         headers: {
           Accept: "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessandrefresh().access}`,
         },
         async onRequest({ request, options }) {
-          console.log(options, "getproject options has been ran");
           if (!hasexp().value) return request;
           else {
             const token = await updateToken();

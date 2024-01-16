@@ -36,36 +36,19 @@ export const useAuth = defineStore("authentication", () => {
     }
   };
 
-  const unAuthenticate = async () => {
+  const unAuthenticate = () => {
     try {
       nuxtStorage.localStorage.clear();
       access.value = null;
       refresh.value = null;
-
-      return { statusCode: 200 };
-    } catch (error) {}
-  };
-
-  const updateTokens = async () => {
-    if (refresh.value && access.value) {
-      const { data } = await useFetch(
-        "http://127.0.0.1:8000/api/token/refresh/",
-        {
-          method: "post",
-          body: {
-            refresh: refresh.value,
-          },
-        }
-      );
-      const token = await data.value;
-      return token;
+    } catch (error) {
+      console.log(error);
     }
   };
 
   return {
     access,
     refresh,
-    updateTokens,
     setAuthentication,
     unAuthenticate,
   };

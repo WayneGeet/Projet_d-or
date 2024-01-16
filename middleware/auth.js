@@ -5,9 +5,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const { access } = storeToRefs(AuthStore);
 
   if (!access.value) {
-    console.log(!!!access, "invalid auth from middleware");
+    console.log(!!access, "invalid auth from middleware");
     return navigateTo("/accounts/login/");
   } else {
-    console.log(!!!access.value, "we good from middleware");
+    console.log(!!access.value, "we good from middleware");
   }
 });

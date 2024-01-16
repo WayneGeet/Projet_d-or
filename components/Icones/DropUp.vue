@@ -1,0 +1,10 @@
+
+<template>
+    <svg xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" viewBox="0 0 24 24"><path fill="currentColor" d="m7 14l5-5l5 5H7z"></path></svg>
+  </template>
+  
+  <script>
+  export default {
+    name: 'IcTwotoneArrowDropUp'
+  }
+  </script>
