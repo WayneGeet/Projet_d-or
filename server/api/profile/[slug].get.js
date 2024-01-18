@@ -1,14 +1,17 @@
 export default defineEventHandler(async (event) => {
+  const { slug } = event.context.params("slug");
+  console.log(slug, "from get");
   try {
-    const formdata = await readBody(event);
     const token = getRequestHeader(event, "authorization");
-    const response = await fetch("http://127.0.0.1:8000/users/profile/", {
-      method: "get",
-      headers: {
-        Authorization: token,
-      },
-      body: formdata,
-    });
+    const response = await fetch(
+      `http://127.0.0.1:8000/users/profiles/${slug}/`,
+      {
+        method: "get",
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
     if (!response.ok) {
       setResponseStatus(event, 401);
       throw createError({

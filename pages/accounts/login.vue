@@ -22,16 +22,17 @@ definePageMeta({
     layout:"start",
 })
 import { useAuth } from '~/store/auth';
-
+import {useProjects} from '~/store/project'
 // const {$bus} = useNuxtApp()
 const authStore = useAuth()
+const ProjectStore = useProjects()
 
 const email = ref("michaelscott@gmail.com")
 const password = ref("dundermifflin001")
 
 async function login() {
     await authStore.setAuthentication({email:email.value, password:password.value})
-    await navigateTo("/projects/")
+    await navigateTo(`/accounts/profile/${ProjectStore.slug}/`)
     // $bus.$emit("auth-event", isAuthenticated)
 }    
 

@@ -24,6 +24,8 @@ definePageMeta({
 })
 const ProjectStore = useProjects()
 
+// const user = await ProjectStore.getUser()
+// console.log(user)
 const projects = ref(null)
 const data = await ProjectStore.getProjects()   
 const prjs = data.value

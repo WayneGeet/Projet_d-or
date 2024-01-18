@@ -1,10 +1,10 @@
 export default defineEventHandler(async (event) => {
-  const accessToken = await useStorage().getItem("access");
+  const token = getRequestHeader(event, "authorization");
   try {
     const response = await fetch("http://127.0.0.1:8000/users/me/", {
       method: "get",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
     });

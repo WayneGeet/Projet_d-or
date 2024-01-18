@@ -12,12 +12,15 @@ export const useProjects = defineStore("projects", () => {
   const accessandrefresh = () => {
     return { access: authStore.access, refresh: authStore.refresh };
   };
+  const slug = ref(jwtDecode(accessandrefresh().access).slug);
+  console.log(slug.value, "this is slug");
 
   const hasexp = () => {
     const expirationTime = ref(jwtDecode(accessandrefresh().access).exp);
     const isExpired = ref(dayjs.unix(expirationTime.value).diff(dayjs()) < 1);
     return isExpired;
   };
+
   const updateToken = async () => {
     const refreshToken = authStore.refresh;
     const { data: token } = await useFetch("/api/refresh/", {
@@ -45,6 +48,7 @@ export const useProjects = defineStore("projects", () => {
         else {
           const token = await updateToken();
           options.headers.Authorization = `Bearer ${token.access}`;
+          console.log(token.access);
           // checking if the local storage has expired
         }
       },
@@ -133,11 +137,12 @@ export const useProjects = defineStore("projects", () => {
     else throw createError({ statusCode: 400, statusMessage: error.value });
   };
 
-  const setProfile = async ({ phone_number, county, photo }) => {
-    const { data, error } = await useFetch("/api/profile", {
-      method: "post",
-      body: { photo, phone_number, county },
+  const updateProfile = async (fd, slug) => {
+    const { data, error } = await useFetch(`/api/profile/${slug}/`, {
+      method: "put",
+      body: fd,
       headers: {
+        Accept: "multipart/form-data",
         Authorization: `Bearer ${accessandrefresh().access}`,
       },
       async onRequest({ request, options }) {
@@ -153,10 +158,10 @@ export const useProjects = defineStore("projects", () => {
     else console.log(error.value);
   };
 
-  const getProfile = async (id) => {
-    const { data, error } = await useFetch(`/api//${id}`, {
+  const getProfile = async () => {
+    const { data, error } = await useFetch(`/api/profile/${slug.value}`, {
       headers: {
-        Accept: "application/json",
+        Accept: "multipart/form-data",
         Authorization: `Bearer ${accessandrefresh().access}`,
       },
       async onRequest({ request, options }) {
@@ -176,5 +181,13 @@ export const useProjects = defineStore("projects", () => {
     projects.value = data.value;
     return data;
   };
-  return { getProjects, getProject, projects, postProject, likeFn, setProfile };
+  return {
+    getProjects,
+    getProject,
+    projects,
+    postProject,
+    likeFn,
+    updateProfile,
+    getProfile,
+  };
 });

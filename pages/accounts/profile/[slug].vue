@@ -13,7 +13,7 @@
                 <div class="w-full">
                     <label for="" class="text-sm">Profile Photo</label>
                     <input class="w-full px-3 py-2 border-b outline-none border-300 focus:shadow-sm focus:shadow-gray-100 focus:border-gray-400" 
-                    type="file"  id="photo">
+                    type="file" @change="handlePhotoUpload" id="photo">
                 </div>
             </article>
 
@@ -24,28 +24,32 @@
 
 <script setup>
 import { useProjects } from '~/store/project';
+import { jwtDecode } from "jwt-decode";
+import {useAuth} from "~/store/auth"
+
 definePageMeta({
     middleware:"auth"
 })
 
 const ProjectStore = useProjects()
+const authStore = useAuth()
 // states
 const phone_number = ref("")
 const county = ref("")
-const dp = ref("")
-
+const photo = ref("")
+const slug = jwtDecode(authStore.access).slug
 // methods
 const handlePhotoUpload = (event) => {
-    dp.value = event.target.files[0]
+    photo.value = event.target.files[0]
 }
 const handleSubmit = async () => {
     const fd = new FormData()
     fd.append("phone_number", phone_number.value)
     fd.append("county", county.value)
-    fd.append("dp", dp.value)
-    const data = await ProjectStore.setProfile(fd)   
-    console.log(data) 
-    // navigateTo("/projects/")
+    fd.append("photo", photo.value)
+    const data = await ProjectStore.updateProfile(fd, slug)
+    console.log(data)   
+    navigateTo("/projects/")
 }
 </script>
 
