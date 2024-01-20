@@ -8,7 +8,7 @@
                 </div>
                 <div class="w-full">
                     <label for="county" class="text-sm">County</label>
-                    <input class="w-full px-3 py-2 border-b outline-none border-300 focus:shadow-sm focus:shadow-gray-100 focus:border-gray-400" type="text" id="county" v-model="county">
+                    <input required class="w-full px-3 py-2 border-b outline-none border-300 focus:shadow-sm focus:shadow-gray-100 focus:border-gray-400" type="text" id="county" v-model="county">
                 </div>
                 <div class="w-full">
                     <label for="" class="text-sm">Profile Photo</label>
@@ -24,9 +24,7 @@
 
 <script setup>
 import { useProjects } from '~/store/project';
-import { jwtDecode } from "jwt-decode";
 import {useAuth} from "~/store/auth"
-
 definePageMeta({
     middleware:"auth"
 })
@@ -37,7 +35,6 @@ const authStore = useAuth()
 const phone_number = ref("")
 const county = ref("")
 const photo = ref("")
-const slug = jwtDecode(authStore.access).slug
 // methods
 const handlePhotoUpload = (event) => {
     photo.value = event.target.files[0]
@@ -46,9 +43,9 @@ const handleSubmit = async () => {
     const fd = new FormData()
     fd.append("phone_number", phone_number.value)
     fd.append("county", county.value)
-    fd.append("photo", photo.value)
-    const data = await ProjectStore.updateProfile(fd, slug)
-    console.log(data)   
+    fd.append("photo", photo.value) 
+    const responseData = await ProjectStore.updateProfile(fd)
+    console.log(responseData)
     navigateTo("/projects/")
 }
 </script>

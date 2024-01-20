@@ -1,10 +1,11 @@
 import { defineStore } from "pinia";
 import nuxtStorage from "nuxt-storage";
+// import { jwtDecode } from "jwt-decode";
 
 export const useAuth = defineStore("authentication", () => {
   const access = ref(nuxtStorage.localStorage.getData("access"));
   const refresh = ref(nuxtStorage.localStorage.getData("refresh"));
-  const slug = ref(nuxtStorage.localStorage.getData("slug"));
+  const slug = ref("");
   // const loading = ref(false);
   const registration = async ({ fname, lname, email, id_no, password }) => {
     const { data, error } = await useFetch("/api/register", {
@@ -12,10 +13,6 @@ export const useAuth = defineStore("authentication", () => {
       body: { fname, lname, email, id_no, password },
     });
     if (data.value) {
-      const n = data.value;
-      const fname = `${n.first_name}-${n.last_name}`.toLowerCase();
-      nuxtStorage.localStorage.setData("slug", fname, 15, "d");
-
       return data;
     } else console.log(error.value);
   };
@@ -38,7 +35,7 @@ export const useAuth = defineStore("authentication", () => {
 
       access.value = tokens.value.access;
       refresh.value = tokens.value.refresh;
-
+      // slug.value = jwtDecode(access.value).slug;
       nuxtStorage.localStorage.setData("access", tokens.value.access, 1, "d");
       nuxtStorage.localStorage.setData(
         "refresh",

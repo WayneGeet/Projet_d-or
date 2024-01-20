@@ -8,15 +8,15 @@ export const useProjects = defineStore("projects", () => {
   authStore.$subscribe((event) => console.log("subscribe is working"));
   const projects = ref(null);
   const dayjs = useDayjs();
-
+  const profile = ref(undefined);
   const accessandrefresh = () => {
     return { access: authStore.access, refresh: authStore.refresh };
   };
-  const slug = ref(jwtDecode(accessandrefresh().access).slug);
-  console.log(slug.value, "this is slug");
 
+  const slug = ref("");
   const hasexp = () => {
-    const expirationTime = ref(jwtDecode(accessandrefresh().access).exp);
+    if (!accessandrefresh().access) return;
+    const expirationTime = ref(jwtDecode(authStore.access).exp);
     const isExpired = ref(dayjs.unix(expirationTime.value).diff(dayjs()) < 1);
     return isExpired;
   };
@@ -48,7 +48,6 @@ export const useProjects = defineStore("projects", () => {
         else {
           const token = await updateToken();
           options.headers.Authorization = `Bearer ${token.access}`;
-          console.log(token.access);
           // checking if the local storage has expired
         }
       },
@@ -137,12 +136,12 @@ export const useProjects = defineStore("projects", () => {
     else throw createError({ statusCode: 400, statusMessage: error.value });
   };
 
-  const updateProfile = async (fd, slug) => {
-    const { data, error } = await useFetch(`/api/profile/${slug}/`, {
+  const updateProfile = async (fd) => {
+    slug.value = jwtDecode(accessandrefresh().access).slug;
+    const { data, error } = await useFetch(`/api/profile/${slug.value}/`, {
       method: "put",
       body: fd,
       headers: {
-        Accept: "multipart/form-data",
         Authorization: `Bearer ${accessandrefresh().access}`,
       },
       async onRequest({ request, options }) {
@@ -159,26 +158,29 @@ export const useProjects = defineStore("projects", () => {
   };
 
   const getProfile = async () => {
-    const { data, error } = await useFetch(`/api/profile/${slug.value}`, {
-      headers: {
-        Accept: "multipart/form-data",
-        Authorization: `Bearer ${accessandrefresh().access}`,
-      },
-      async onRequest({ request, options }) {
-        if (!hasexp().value) return request;
-        else {
-          const token = await updateToken();
-          options.headers.Authorization = `Bearer ${token.access}`;
-        }
-      },
-    });
+    slug.value = jwtDecode(accessandrefresh().access).slug;
+    const { data, error } = await useFetch(
+      `http://127.0.0.1:8000/users/profiles/${slug.value}/`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessandrefresh().access}`,
+        },
+        async onRequest({ request, options }) {
+          if (!hasexp().value) return request;
+          else {
+            const token = await updateToken();
+            options.headers.Authorization = `Bearer ${token.access}`;
+          }
+        },
+      }
+    );
     if (error.value) {
       authStore.access = null;
       authStore.refresh = null;
       localStorage.clear();
       console.log(error.value + " this is from project store");
     }
-    projects.value = data.value;
+    profile.value = data.value;
     return data;
   };
   return {
@@ -189,5 +191,8 @@ export const useProjects = defineStore("projects", () => {
     likeFn,
     updateProfile,
     getProfile,
+    hasexp,
+    updateToken,
+    accessandrefresh,
   };
 });

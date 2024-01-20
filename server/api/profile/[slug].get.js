@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const { slug } = event.context.params("slug");
+  const { slug } = getRouterParam(event, "slug");
   console.log(slug, "from get");
   try {
     const token = getRequestHeader(event, "authorization");

@@ -57,9 +57,11 @@
 
 <script setup>
 import {useAuth} from "~/store/auth.js"
+import {useProjects} from "~/store/project"
 import { storeToRefs } from "pinia";
 
 const AuthStore = useAuth()
+const ProjectStore = useProjects()
 AuthStore.$subscribe((event)=> console.log("watching authstore"))
 const {access} = storeToRefs(AuthStore)
 // <---------------states------------------>
@@ -71,14 +73,17 @@ const search_value = ref("")
 // user profile
 const values = ref(['profile', 'post a project', 'view map', 'logout'])
 const showProf = ref(true)
+const profileData = await ProjectStore.getProfile()
+const {first_name, last_name} = profileData.value
 // <--------------methods------------------>
 const selectedType = (item) => {
     type.value = item
 }
+
 const profileNav = (location) => {
     switch(location){
         case 'profile':
-            navigateTo("/accounts/profile")
+            navigateTo(`/accounts/profile/${first_name}_${last_name[0]}/`)
             break;
         case 'post a project':
             navigateTo("/projects/create/")

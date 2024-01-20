@@ -1,9 +1,9 @@
 export default defineEventHandler(async (event) => {
   try {
-    const { slug } = event.context.params("slug");
+    const { slug } = getRouterParams(event, "slug");
     console.log(slug, "from put");
-    const formdata = await readBody(event);
-    console.log(formdata, "this is form data");
+    const fd = await readFormData(event);
+    console.log(fd, "this is the formdata");
 
     const token = getRequestHeader(event, "authorization");
     const response = await fetch(
@@ -11,10 +11,9 @@ export default defineEventHandler(async (event) => {
       {
         method: "put",
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: token,
         },
-        body: formdata,
+        body: fd,
       }
     );
     if (!response.ok) {
@@ -28,6 +27,7 @@ export default defineEventHandler(async (event) => {
       return { message: "profile updated" };
     }
   } catch (error) {
+    console.log(error);
     throw createError({
       statusCode: 500,
       statusMessage: "check the server",
