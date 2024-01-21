@@ -74,7 +74,7 @@ const search_value = ref("")
 const values = ref(['profile', 'post a project', 'view map', 'logout'])
 const showProf = ref(true)
 const profileData = await ProjectStore.getProfile()
-const {first_name, last_name} = profileData.value
+const getName = profileData?.value
 // <--------------methods------------------>
 const selectedType = (item) => {
     type.value = item
@@ -83,7 +83,7 @@ const selectedType = (item) => {
 const profileNav = (location) => {
     switch(location){
         case 'profile':
-            navigateTo(`/accounts/profile/${first_name}_${last_name[0]}/`)
+            navigateTo(`/accounts/profile/${getName.first_name}_${getName.last_name[0]}/`)
             break;
         case 'post a project':
             navigateTo("/projects/create/")

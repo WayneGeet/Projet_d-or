@@ -27,8 +27,8 @@ import {useProjects} from '~/store/project'
 const authStore = useAuth()
 const ProjectStore = useProjects()
 
-const email = ref("michaelscott@gmail.com")
-const password = ref("dundermifflin001")
+const email = ref("")
+const password = ref("")
 
 async function login() {
     await authStore.setAuthentication({email:email.value, password:password.value})

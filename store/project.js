@@ -137,31 +137,33 @@ export const useProjects = defineStore("projects", () => {
   };
 
   const updateProfile = async (fd) => {
-    slug.value = jwtDecode(accessandrefresh().access).slug;
-    const { data, error } = await useFetch(`/api/profile/${slug.value}/`, {
-      method: "put",
-      body: fd,
-      headers: {
-        Authorization: `Bearer ${accessandrefresh().access}`,
-      },
-      async onRequest({ request, options }) {
-        if (!hasexp().value) return request;
-        else {
-          const token = await updateToken();
-          options.headers.Authorization = `Bearer ${token.access}`;
-          // checking if the local storage has expired
-        }
-      },
-    });
-    if (data.value) return data;
-    else console.log(error.value);
+    try {
+      slug.value = jwtDecode(accessandrefresh().access).slug;
+      const { data, error } = await useFetch(`/api/profile/${slug.value}/`, {
+        method: "put",
+        body: fd,
+        headers: {
+          Authorization: `Bearer ${accessandrefresh().access}`,
+        },
+        async onRequest({ request, options }) {
+          if (!hasexp().value) return request;
+          else {
+            const token = await updateToken();
+            options.headers.Authorization = `Bearer ${token.access}`;
+            // checking if the local storage has expired
+          }
+        },
+      });
+      if (data.value) return data;
+    } catch (error) {
+      console.log(error.value);
+    }
   };
 
   const getProfile = async () => {
-    slug.value = jwtDecode(accessandrefresh().access).slug;
-    const { data, error } = await useFetch(
-      `http://127.0.0.1:8000/users/profiles/${slug.value}/`,
-      {
+    try {
+      slug.value = jwtDecode(accessandrefresh().access).slug;
+      const { data, error } = await useFetch(`/api/profile/${slug.value}/`, {
         headers: {
           Authorization: `Bearer ${accessandrefresh().access}`,
         },
@@ -172,16 +174,15 @@ export const useProjects = defineStore("projects", () => {
             options.headers.Authorization = `Bearer ${token.access}`;
           }
         },
-      }
-    );
-    if (error.value) {
+      });
+      profile.value = data?.value;
+      return data;
+    } catch (error) {
       authStore.access = null;
       authStore.refresh = null;
       localStorage.clear();
       console.log(error.value + " this is from project store");
     }
-    profile.value = data.value;
-    return data;
   };
   return {
     getProjects,

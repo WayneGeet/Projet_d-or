@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const { slug } = getRouterParam(event, "slug");
+  const { slug } = getRouterParams(event, "slug");
   console.log(slug, "from get");
   try {
     const token = getRequestHeader(event, "authorization");
@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
       });
     } else {
       const profile_data = await response.json();
+      console.log(profile_data, "this is the photo url");
       return profile_data;
     }
   } catch (error) {
