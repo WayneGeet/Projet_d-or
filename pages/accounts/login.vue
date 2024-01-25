@@ -32,7 +32,7 @@ const password = ref("")
 
 async function login() {
     await authStore.setAuthentication({email:email.value, password:password.value})
-    await navigateTo(`/accounts/profile/get-started/`)
+    await navigateTo(`/projects/`)
     // $bus.$emit("auth-event", isAuthenticated)
 }    
 

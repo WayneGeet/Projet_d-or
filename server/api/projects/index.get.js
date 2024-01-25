@@ -1,13 +1,18 @@
 export default defineEventHandler(async (event) => {
+  const query = getQuery(event);
+  console.log(query.search);
   try {
     const token = getRequestHeader(event, "authorization");
-    const response = await fetch("http://127.0.0.1:8000/projects/", {
-      method: "get",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-      },
-    });
+    const response = await fetch(
+      `http://127.0.0.1:8000/projects/?search=${query.search}`,
+      {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
     if (!response.ok) {
       setResponseStatus(event, 401);
       throw createError({

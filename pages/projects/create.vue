@@ -13,7 +13,23 @@
 
             <div class="">
                 <label for="project-type">Project Type</label>
-                <select id="project-type" v-model="selected_type">
+                <select class="max-h-[10rem] overflow-auto" id="project-type" v-model="selected_type">
+                    <option disabled value="">Please select one</option>
+                    <option>Urban</option>
+                    <option>Transport</option>
+                    <option>Agricultural</option>
+                    <option>Mining</option>
+                    <option>Water and Sanitation</option>
+                    <option>Disaster Management</option>
+                    <option>Public Safety</option>
+                    <option>Environment Conservation</option>
+                    <option>Smart City</option>
+                    <option>Health Care</option>
+                </select>
+            </div>
+            <div class="">
+                <label for="phase">Project Phase</label>
+                <select id="phase" v-model="selected_type">
                     <option disabled value="">Please select one</option>
                     <option>Initial</option>
                     <option>Planning</option>
@@ -117,6 +133,7 @@ const search_text = ref("")
 const showDialog = ref(false)
 const budget = ref("")
 const project_name = ref("")
+const county = ref("")
 const handleFocus = () => {
     showDialog.value = true
 }
@@ -159,6 +176,8 @@ const control = ref({
 const lnglat = ref(undefined)
 
 const handlePlaceSelect = (location) => {
+    console.log(location.place_name)
+    county.value = location.place_name
     lnglat.value = location.center
     console.log(lnglat.value)
     isWatching.value = false
@@ -177,6 +196,7 @@ const handleSubmit = async () => {
     fd.append("budget", budget.value);
     fd.append("name", project_name.value);
     fd.append("project_type", selected_type.value);
+    fd.append("county", county.value)
     console.log(fd.values(), " this is what is going to the backend")
 
     const {msg} = await ProjectStore.postProject(fd)   

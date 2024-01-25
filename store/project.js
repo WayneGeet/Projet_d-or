@@ -9,6 +9,7 @@ export const useProjects = defineStore("projects", () => {
   const projects = ref(null);
   const dayjs = useDayjs();
   const profile = ref(undefined);
+  const filterValue = ref("");
   const accessandrefresh = () => {
     return { access: authStore.access, refresh: authStore.refresh };
   };
@@ -37,32 +38,40 @@ export const useProjects = defineStore("projects", () => {
   };
 
   const getProjects = async () => {
-    const { data, error } = await useFetch("/api/projects/", {
-      cache: false,
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${accessandrefresh().access}`,
-      },
-      async onRequest({ request, options }) {
-        if (!hasexp().value) return request;
-        else {
-          const token = await updateToken();
-          options.headers.Authorization = `Bearer ${token.access}`;
-          // checking if the local storage has expired
+    try {
+      const { data, error } = await useFetch(
+        `/api/projects/?search=${filterValue.value}`,
+        {
+          cache: false,
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${accessandrefresh().access}`,
+          },
+          async onRequest({ request, options }) {
+            if (!hasexp().value) return request;
+            else {
+              const token = await updateToken();
+              options.headers.Authorization = `Bearer ${token.access}`;
+              // checking if the local storage has expired
+            }
+          },
         }
-      },
-    });
-    if (error.value) {
+      );
+      if (error.value) {
+        console.log(error.value);
+      }
+      projects.value = data.value;
+      return data;
+    } catch (error) {
+      console.log(error.value, " from catch block");
       authStore.access = null;
       authStore.refresh = null;
       localStorage.clear();
     }
-    projects.value = data.value;
-    return data;
   };
 
   const getProject = async (id) => {
-    const { data, error } = await useFetch(`/api/projects/${id}`, {
+    const { data, error } = await useFetch(`/api/projects/${id}/`, {
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${accessandrefresh().access}`,
@@ -114,26 +123,30 @@ export const useProjects = defineStore("projects", () => {
   };
 
   const likeFn = async (id) => {
-    const { data, error } = await useFetch(
-      `http://127.0.0.1:8000/projects/${id}/like/`,
-      {
-        method: "post",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${accessandrefresh().access}`,
-        },
-        async onRequest({ request, options }) {
-          if (!hasexp().value) return request;
-          else {
-            const token = await updateToken();
-            options.headers.Authorization = `Bearer ${token.access}`;
-          }
-        },
-      }
-    );
-    const response = data.value;
-    if (response) return data;
-    else throw createError({ statusCode: 400, statusMessage: error.value });
+    try {
+      const { data, error } = await useFetch(
+        `http://127.0.0.1:8000/projects/${id}/like/`,
+        {
+          method: "post",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${accessandrefresh().access}`,
+          },
+          async onRequest({ request, options }) {
+            if (!hasexp().value) return request;
+            else {
+              const token = await updateToken();
+              options.headers.Authorization = `Bearer ${token.access}`;
+            }
+          },
+        }
+      );
+      const response = data.value;
+      if (response) return data;
+    } catch (error) {
+      console.log(error);
+      throw createError({ statusCode: 400, statusMessage: error.value });
+    }
   };
 
   const updateProfile = async (fd) => {
@@ -195,5 +208,6 @@ export const useProjects = defineStore("projects", () => {
     hasexp,
     updateToken,
     accessandrefresh,
+    filterValue,
   };
 });

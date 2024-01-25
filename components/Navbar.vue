@@ -1,6 +1,6 @@
 <template>
     <header class="flex bg-blue-100 items-center justify-around">
-        <div>
+        <div @click="navigateTo('/projects/')">
             <img class="w-20 h-20 object-contain" src="~/assets/images/logo.jpg" alt="logo">
         </div>
         <section class="flex items-center gap-6">
@@ -28,7 +28,7 @@
                 border-none outline-none" type="text" name="search" id="search"
                 placeholder="search location, title, budget etc.."
                 v-model="search_value" >
-                <div class="w-6 h-6 p-4 relative -top-full cursor-pointer bg-sky-500 transition-colors duration-400 hover:bg-sky-600 rounded-md text-white flex items-center justify-center">
+                <div @click="search()" class="w-6 h-6 p-4 relative -top-full cursor-pointer bg-sky-500 transition-colors duration-400 hover:bg-sky-600 rounded-md text-white flex items-center justify-center">
                     <div class=""><IconesSearch/></div>
                 </div>
             </div>
@@ -38,12 +38,12 @@
         </div>
 
         <section class="relative w-[10rem] left-5">
-            <div @click="showProf = !showProf" class="relative left-[50%] cursor-pointer rounded-full border-4 border-white w-8 h-8">
+            <div @mouseenter="showProf = false" @click="showProf = !showProf" class="relative left-[50%] cursor-pointer rounded-full border-4 border-white w-8 h-8">
                 <img src="" alt="">
             </div>
             <div :class="{'hidden':showProf}" class="absolute top-10 shadow-gray-400 shadow-md rounded-md py-2 w-full bg-white bg-opacity-10 backdrop-blur-sm">
                 <menu>
-                    <div @click="profileNav(i)" class="hover:bg-slate-100 cursor-pointer py-[4px] px-3 hover:text-blue-400 hover:font-medium rounded-sm" v-for="i in values" :key="i">
+                    <div @click="profileNav(i)" class="text-sm hover:bg-slate-100 cursor-pointer py-[4px] px-3 hover:text-blue-400 hover:font-medium rounded-sm" v-for="i in values" :key="i">
                         <li>{{ i }}</li>
                     </div>
                 </menu>
@@ -64,18 +64,22 @@ const AuthStore = useAuth()
 const ProjectStore = useProjects()
 AuthStore.$subscribe((event)=> console.log("watching authstore"))
 const {access} = storeToRefs(AuthStore)
+const {projects} = storeToRefs(ProjectStore)
 // <---------------states------------------>
 const showDD = ref(true)
 const type = ref('Project Type')
 const items = ref(['Food Security','Water and Sanitization','Transport','Urbanization','Education', 'show all'])
 const search_value = ref("")
-
 // user profile
 const values = ref(['profile', 'post a project', 'view map', 'logout'])
 const showProf = ref(true)
 const profileData = await ProjectStore.getProfile()
 const getName = profileData?.value
 // <--------------methods------------------>
+const search = async () => {
+    ProjectStore.filterValue = search_value.value
+}
+
 const selectedType = (item) => {
     type.value = item
 }
