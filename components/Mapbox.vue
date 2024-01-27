@@ -8,7 +8,7 @@
             center: [props.control.lng, props.control.lat],
             zoom: props.control.zoom
         }"
-        @click="mapClick"
+        @click="onClick()"
       >
         <MapboxGeolocateControl position="top-left" />
         <slot></slot>
@@ -18,14 +18,13 @@
 </template>
 
 <script setup>
-    const props = defineProps(['control', 'style', 'width', 'height', 'mapId'])
+    const props = defineProps(['control', 'style', 'width', 'height', 'mapId', 'onClick'])
     onMounted(() => {
       const mapRef = useMapboxRef('projects')
       console.log(mapRef.value)
       const mapStyle = computed(() => {
         return mapRef.value?.getStyle();
       });
-      console.log(mapStyle, " this is the mapstyle")
       })
     // const handleMarkerClick = () => {
     //   console.log("marker clicked")

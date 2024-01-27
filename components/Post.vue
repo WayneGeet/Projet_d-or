@@ -1,7 +1,5 @@
 <template>
     <div class="relative">
-        <div v-if="isLiked" class="absolute rounded-full bg-slate-100 p-2 text-center left-3 top-3 bg-opacity-70"><IconesHeart/></div>
-        <div v-else class="absolute rounded-full bg-slate-100 p-2 text-center left-3 top-3 bg-opacity-70"><IconesHeartLike/></div>
         <div class="">
             <img class="w-full object-center h-32 object-cover overflow-hidden" :src="photo" :alt="name">
         </div>
@@ -19,7 +17,7 @@
 </template>
 
 <script setup>
-defineProps(['name', 'budget', 'location','photo', 'phase', 'project_type', 'isLiked'])
+const props = defineProps(['name', 'budget', 'location','photo', 'phase', 'project_type', 'isLiked'])
 </script>
 
 <style scoped>

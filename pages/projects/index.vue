@@ -2,21 +2,45 @@
     <div class="bg-slate-100 overflow-hidden min-h-screen px-5 py-5">
         <p>Welcome </p>
         <section class="">
+            
             <div v-if="projects" class="grid-custom">
-                <article @click="navigateTo(`/projects/${project.id}`)" class="bg-white w-full shadow-md shadow-gray-400 rounded-md overflow-hidden" v-for="project in projects" :key="project.id" @dblclick="likeFn(project.id)">
-                    <Post :name="project.properties.name" :location="project.properties.county" 
-                    :photo="project.properties.photo" :isLiked="()=>likeFn(project.id)" :phase="project.properties.phase" :budget="project.properties.budget" :project_type="project.properties.project_type"/>
-                </article>
+                <article
+                    class="relative bg-white w-full shadow-md shadow-gray-400 rounded-md overflow-hidden"
+                    v-for="project in projects"
+                    :key="project.id"
+                    >
+                    <div @click.stop="likeFn(project)" class="cursor-pointer absolute z-10 left-3 top-3">
+                        <div v-if="ProjectStore.likedProjects.includes(project.id)" class="rounded-full bg-slate-100 p-2 text-center bg-opacity-70">
+                        <IconesHeartLike/>
+                        </div>
+                        <div v-else class="rounded-full bg-slate-100 p-2 text-center bg-opacity-70">
+                        <IconesHeart/>
+                        </div>
+                    </div>
+                    <div @click="navigateTo(`/projects/${project.id}/`)">
+                        <Post
+                        :name="project.properties.name"
+                        :location="project.properties.county"
+                        :photo="project.properties.photo"
+                        :phase="project.properties.phase"
+                        :budget="project.properties.budget"
+                        :project_type="project.properties.project_type"
+                        />
+                    </div>
+                    </article>
+
             </div>
             <h2 v-else>No projects</h2>
         </section>
-        
-
     </div>
 </template>
 
 <script setup>
 import {useProjects} from "~/store/project";
+import { jwtDecode } from "jwt-decode";
+import {useAuth} from "~/store/auth";
+import { setData } from 'nuxt-storage/local-storage';
+const authStore = useAuth()
 
 definePageMeta({
     layout:"default",
@@ -25,30 +49,37 @@ definePageMeta({
 })
 // states
 const projects = ref(null)
-const isLiked = ref(undefined)
-console.log(isLiked, " this is isLiked")
 const ProjectStore = useProjects()
-
-// const user = await ProjectStore.getUser()
-// console.log(user)
 await ProjectStore.getProjects("")   
 const prjs = ProjectStore.projects
 projects.value = prjs?.features
-watch(() => ProjectStore.filterValue, async (oldValue, newValue) => {
-    console.log(oldValue, newValue, ' this watch from index')
+console.log(projects.value[0])
+
+watch([() => ProjectStore.filterValue, () => ProjectStore.likedProjects], async (oldValue, newValue) => {
     await ProjectStore.getProjects()
     const prjs = ProjectStore.projects
     projects.value = prjs?.features
-    console.log(projects.value)
-})
+}, {deep:true})
 // methods
-const likeFn = async (id) => {
-    const data = await ProjectStore.likeFn(id)
-    isLiked.value = data.value.message
-    console.log(isLiked.value)
-    return data.value.message==="You have liked this post"
-}
 
+const likeFn = async (post) => {
+    const data = await ProjectStore.likeFn(post.id)
+    console.log(data.message, " this is the message from likeFn")
+    await ProjectStore.getProject(post.id)
+    if(data.message === "You have disliked this project"){
+        ProjectStore.likedProjects = ProjectStore.likedProjects.filter(i => i !== post.id)
+        console.log(ProjectStore.likedProjects, " removed the project's id")
+        setData("liked", ProjectStore.likedProjects, 15, "d")
+        return 
+    }
+    else
+    {
+        ProjectStore.likedProjects = [...ProjectStore.likedProjects, post.id]
+        setData("liked", ProjectStore.likedProjects, 15, "d")
+        console.log(ProjectStore.likedProjects, " added the user's like")
+        return null
+    }
+}
 
 </script>
 

@@ -30,8 +30,12 @@ const id = useRoute().params.id
 // states
 const project = ref(null)
 const data = await ProjectStore.getProject(id)
-console.log(data?.value, "from id")
 project.value = data.value
+
+watch(() => ProjectStore.likedProjects, async () => {
+    const data = await ProjectStore.getProject(id)
+    project.value = data.value
+})
 
     
 </script>

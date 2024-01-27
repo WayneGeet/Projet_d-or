@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Mapbox title="Welcome to Map View" :control="control" style="position: relative; top: 0; bottom: 0;" mapId="projects">
+        <Mapbox title="Welcome to Map View" :onClick="(e)=>console.log(e.lngLat)" :control="control" style="position: relative; top: 0; bottom: 0;" mapId="projects">
           <!-- <div class="flex flex-col text-2xl text-black absolute top-0 right-5 z-20 text-center items-center justify-center">
           <div @click="() => zoomControl('add')" class="hover:bg-gray-100 cursor-pointer font-bold w-5 h-5 border bg-white p-3 text-center mb-1 flex justify-center items-center">
             <p><IconesAdd/></p>

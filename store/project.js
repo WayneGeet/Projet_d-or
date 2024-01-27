@@ -10,6 +10,7 @@ export const useProjects = defineStore("projects", () => {
   const dayjs = useDayjs();
   const profile = ref(undefined);
   const filterValue = ref("");
+  const likedProjects = ref(getData("liked") || []);
   const accessandrefresh = () => {
     return { access: authStore.access, refresh: authStore.refresh };
   };
@@ -141,8 +142,8 @@ export const useProjects = defineStore("projects", () => {
           },
         }
       );
-      const response = data.value;
-      if (response) return data;
+      const response = await data?.value;
+      return response;
     } catch (error) {
       console.log(error);
       throw createError({ statusCode: 400, statusMessage: error.value });
@@ -209,5 +210,6 @@ export const useProjects = defineStore("projects", () => {
     updateToken,
     accessandrefresh,
     filterValue,
+    likedProjects,
   };
 });

@@ -16,7 +16,7 @@
 
                     <menu :class="{'hidden':showDD}" class="max-h-[45vh] mt-2 overflow-auto transition-all duration-700 absolute left-0 top-full w-full bg-slate-100 rounded-md px-2 py-2
                     flex flex-col gap-2">
-                        <div @click="selectedType(item)" :class="{'bg-slate-300 text-gray-600 font-medium':type===item}" class="text-gray-500 cursor-pointer hover:bg-slate-200 rounded-md p-[4px] text-sm" v-for="item in items" :key="item">
+                        <div @click="selectedType(item)" :class="{'bg-slate-300 text-gray-600 font-medium':type===item}" class="text-gray-500 cursor-pointer hover:bg-slate-200 rounded-md p-[4px] text-sm z-20" v-for="item in items" :key="item">
                             <li class="">{{ item }}</li>
                         </div>
                     </menu>
@@ -28,12 +28,12 @@
                 border-none outline-none" type="text" name="search" id="search"
                 placeholder="search location, title, budget etc.."
                 v-model="search_value" >
-                <div @click="search()" class="w-6 h-6 p-4 relative -top-full cursor-pointer bg-sky-500 transition-colors duration-400 hover:bg-sky-600 rounded-md text-white flex items-center justify-center">
+                <div @click="search()" class="w-6 h-6 p-4 relative -top-full cursor-pointer bg-[#228cdb] transition-colors duration-400 hover:bg-sky-600 rounded-md text-white flex items-center justify-center">
                     <div class=""><IconesSearch/></div>
                 </div>
             </div>
         </section>
-        <div class="bg-sky-700 text-white hover:bg-sky-600 transition-colors duration-400 rounded-md px-3 py-2 text-sm text-center cursor-pointer left-16 relative" @click="navigateTo('/projects/create')">
+        <div class="bg-[#228cdb] text-white hover:bg-sky-700 transition-colors duration-400 rounded-md px-3 py-2 text-sm text-center cursor-pointer left-16 relative" @click="navigateTo('/projects/create')">
             <h2>+ Post your project</h2>
         </div>
 
@@ -65,6 +65,9 @@ const ProjectStore = useProjects()
 AuthStore.$subscribe((event)=> console.log("watching authstore"))
 const {access} = storeToRefs(AuthStore)
 const {projects} = storeToRefs(ProjectStore)
+
+
+
 // <---------------states------------------>
 const showDD = ref(true)
 const type = ref('Project Type')
