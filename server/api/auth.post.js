@@ -12,8 +12,8 @@ export default defineEventHandler(async (event) => {
       }),
     });
     const tokens = await response.json();
-    await useStorage().setItem("access", tokens.access);
-    await useStorage().setItem("refresh", tokens.refresh);
+    // await useStorage().setItem("access", tokens.access);
+    // await useStorage().setItem("refresh", tokens.refresh);
 
     return tokens;
   } catch (err) {

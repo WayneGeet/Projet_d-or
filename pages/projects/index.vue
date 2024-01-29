@@ -39,7 +39,7 @@
 import {useProjects} from "~/store/project";
 import { jwtDecode } from "jwt-decode";
 import {useAuth} from "~/store/auth";
-import { setData } from 'nuxt-storage/local-storage';
+import { getData, setData } from 'nuxt-storage/local-storage';
 const authStore = useAuth()
 
 definePageMeta({
@@ -50,11 +50,13 @@ definePageMeta({
 // states
 const projects = ref(null)
 const ProjectStore = useProjects()
-await ProjectStore.getProjects("")   
+await ProjectStore.getProjects("")  
+ProjectStore.$subscribe((event) => console.log("subscribe is working"));
+ProjectStore.likedProjects = getData('liked')
+
 const prjs = ProjectStore.projects
 projects.value = prjs?.features
-console.log(projects.value[0])
-
+console.log(getData("liked"))
 watch([() => ProjectStore.filterValue, () => ProjectStore.likedProjects], async (oldValue, newValue) => {
     await ProjectStore.getProjects()
     const prjs = ProjectStore.projects
@@ -65,7 +67,6 @@ watch([() => ProjectStore.filterValue, () => ProjectStore.likedProjects], async 
 const likeFn = async (post) => {
     const data = await ProjectStore.likeFn(post.id)
     console.log(data.message, " this is the message from likeFn")
-    await ProjectStore.getProject(post.id)
     if(data.message === "You have disliked this project"){
         ProjectStore.likedProjects = ProjectStore.likedProjects.filter(i => i !== post.id)
         console.log(ProjectStore.likedProjects, " removed the project's id")

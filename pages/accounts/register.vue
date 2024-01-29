@@ -31,6 +31,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+    layout:"start",
+})
 import {useAuth} from "~/store/auth"
 
 // initialize store

@@ -35,12 +35,12 @@
           },
           {
             iconComponent: 'IconesGis', // The component name for the GIS icon
-            link: '#',
+            link: '/gis/',
             text: 'gis',
           },
           {
             iconComponent: 'IconesCall', // The component name for the call icon
-            link: '#',
+            link: '/developer/',
             text: 'reach us',
           },
           {
