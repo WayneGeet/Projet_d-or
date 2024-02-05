@@ -41,7 +41,8 @@ import { jwtDecode } from "jwt-decode";
 import {useAuth} from "~/store/auth";
 import { getData, setData } from 'nuxt-storage/local-storage';
 const authStore = useAuth()
-
+const {data:response} = useFetch("localhost:5500/getAuthToken/")
+console.log(response, "this is from server node")
 definePageMeta({
     layout:"default",
     middleware:"auth",

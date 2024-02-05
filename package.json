@@ -22,7 +22,10 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@google/earthengine": "^0.1.388",
     "@pinia/nuxt": "^0.5.1",
+    "express": "^4.18.2",
+    "googleapis": "^131.0.0",
     "jwt-decode": "^4.0.0",
     "mitt": "^3.0.1",
     "nuxt-gmaps": "^1.2.10",
