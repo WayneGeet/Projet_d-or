@@ -16,7 +16,7 @@
 
                     <menu :class="{'hidden':showDD}" class="max-h-[45vh] mt-2 overflow-auto transition-all duration-700 absolute left-0 top-full w-full bg-slate-100 rounded-md px-2 py-2
                     flex flex-col gap-2">
-                        <div @click="selectedType(item)" :class="{'bg-slate-300 text-gray-600 font-medium':type===item}" class="text-gray-500 cursor-pointer hover:bg-slate-200 rounded-md p-[4px] text-sm z-50" v-for="item in items" :key="item">
+                        <div @click="selectedType(item)" :class="{'bg-slate-300 text-gray-600 font-medium':type===item}" class="text-gray-500 cursor-pointer hover:bg-slate-200 rounded-md p-[4px] text-sm z-20" v-for="item in items" :key="item">
                             <li class="">{{ item }}</li>
                         </div>
                     </menu>
@@ -24,12 +24,12 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <input :disable="route.path !== '/projects/'" class="px-3 py-2 w-[17rem] relative text-sm bg-slate-100 text-slate-500 rounded-md
+                <input class="px-3 py-2 w-[17rem] relative text-sm bg-slate-100 text-slate-500 rounded-md
                 border-none outline-none" type="text" name="search" id="search"
                 placeholder="search location, title, budget etc.."
                 v-model="search_value" >
                 <div @click="search()" class="w-6 h-6 p-4 relative -top-full cursor-pointer bg-[#228cdb] transition-colors duration-400 hover:bg-sky-600 rounded-md text-white flex items-center justify-center">
-                    <div class="hover:transition-transform "><IconesSearch/></div>
+                    <div class=""><IconesSearch/></div>
                 </div>
             </div>
         </section>
@@ -38,12 +38,12 @@
         </div>
 
         <section class="relative w-[10rem] left-5">
-            <div @mouseenter="showProf = false" @click="showProf = !showProf" class=" overflow-hidden relative left-[50%] cursor-pointer rounded-full border-4 border-white w-12 h-12">
-                <img class="w-full h-full object-cover object-center" src="" alt="profile photo">
+            <div @mouseenter="showProf = false" @click="showProf = !showProf" class="relative left-[50%] cursor-pointer rounded-full border-4 border-white w-8 h-8">
+                <img src="" alt="">
             </div>
             <div :class="{'hidden':showProf}" class="absolute top-10 shadow-gray-400 shadow-md rounded-md py-2 w-full bg-white bg-opacity-10 backdrop-blur-sm">
                 <menu>
-                    <div @click="profileNav(i)" class="text-sm hover:bg-slate-100 cursor-pointer py-[4px] px-3 hover:text-blue-400 hover:font-medium rounded-sm z-20" v-for="i in values" :key="i">
+                    <div @click="profileNav(i)" class="text-sm hover:bg-slate-100 cursor-pointer py-[4px] px-3 hover:text-blue-400 hover:font-medium rounded-sm" v-for="i in values" :key="i">
                         <li>{{ i }}</li>
                     </div>
                 </menu>
@@ -60,15 +60,14 @@ import {useAuth} from "~/store/auth.js"
 import {useProjects} from "~/store/project"
 import { storeToRefs } from "pinia";
 
-const route = useRoute()
 const AuthStore = useAuth()
 const ProjectStore = useProjects()
 AuthStore.$subscribe((event)=> console.log("watching authstore"))
-// const {access_refresh} = storeToRefs(AuthStore)
-// const {projects} = storeToRefs(ProjectStore)
-// const {data:profile} = useNuxtData('profile')
-// const profile_img = profile.value
-// console.log(profile_img, " from nuxt data")
+const {access} = storeToRefs(AuthStore)
+const {projects} = storeToRefs(ProjectStore)
+
+
+
 // <---------------states------------------>
 const showDD = ref(true)
 const type = ref('Project Type')
@@ -78,9 +77,6 @@ const search_value = ref("")
 const values = ref(['profile', 'post a project', 'view map', 'logout'])
 const showProf = ref(true)
 const profileData = await ProjectStore.getProfile()
-
-
-
 const getName = profileData?.value
 // <--------------methods------------------>
 const search = async () => {

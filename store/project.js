@@ -7,55 +7,51 @@ export const useProjects = defineStore("projects", () => {
   const authStore = useAuth();
   authStore.$subscribe((event) => console.log("subscribe is working"));
   const projects = ref(null);
+  const dayjs = useDayjs();
   const profile = ref(undefined);
   const filterValue = ref("");
   const likedProjects = ref(getData("liked") || []);
-
   const accessandrefresh = () => {
-    return authStore.access_refresh;
+    return { access: authStore.access, refresh: authStore.refresh };
   };
 
   const slug = ref("");
-  // const hasexp().value () => {
-  //   if (!accessandrefresh().access) return;
-  //   const expirationTime = ref(jwtDecode(authStore.access).exp);
-  //   const isExpired = ref(dayjs.unix(expirationTime.value).diff(dayjs()) < 1);
-  //   return isExpired;
-  // };
+  const hasexp = () => {
+    if (!accessandrefresh().access) return;
+    const expirationTime = ref(jwtDecode(authStore.access).exp);
+    const isExpired = ref(dayjs.unix(expirationTime.value).diff(dayjs()) < 1);
+    return isExpired;
+  };
 
-  // const updateToken = async () => {
-  //   const refreshToken = authStore.refresh;
-  //   const { data: token } = await useFetch("/api/refresh/", {
-  //     method: "post",
-  //     body: {
-  //       refresh: refreshToken,
-  //     },
-  //   });
-  //   setData("access", token.value.access, 1, "d");
-  //   setData("refresh", token.value.refresh, 15, "d");
-  //   authStore.access = ref(getData("access"));
-  //   authStore.refresh = ref(getData("refresh"));
-  //   return token.value;
-  // };
-  console.log(authStore.hasexp().value, " has token expired");
+  const updateToken = async () => {
+    const refreshToken = authStore.refresh;
+    const { data: token } = await useFetch("/api/refresh/", {
+      method: "post",
+      body: {
+        refresh: refreshToken,
+      },
+    });
+    setData("access", token.value.access, 1, "d");
+    setData("refresh", token.value.refresh, 15, "d");
+    authStore.access = ref(getData("access"));
+    authStore.refresh = ref(getData("refresh"));
+    return token.value;
+  };
 
   const getProjects = async () => {
-    console.log(" the next three are from getProjects");
-    console.log(accessandrefresh().access, " from get Projects");
-
     try {
       const { data, error } = await useFetch(
         `/api/projects/?search=${filterValue.value}`,
         {
           cache: false,
           headers: {
+            Accept: "application/json",
             Authorization: `Bearer ${accessandrefresh().access}`,
           },
           async onRequest({ request, options }) {
-            if (!authStore.hasexp().value) return request;
+            if (!hasexp().value) return request;
             else {
-              const token = await authStore.updateToken();
-              console.log(token, " this is from update token get projects");
+              const token = await updateToken();
               options.headers.Authorization = `Bearer ${token.access}`;
               // checking if the local storage has expired
             }
@@ -63,35 +59,36 @@ export const useProjects = defineStore("projects", () => {
         }
       );
       if (error.value) {
-        const token = await authStore.updateToken();
-        console.log(token, " this is from error value get projects");
-        console.log(error.value, " getProjects");
+        console.log(error.value);
       }
       projects.value = data.value;
       return data;
     } catch (error) {
-      console.log(error, " from catch block");
-      // authStore.access_refresh = null;
-      // localStorage.clear();
+      console.log(error.value, " from catch block");
+      authStore.access = null;
+      authStore.refresh = null;
+      localStorage.clear();
     }
   };
 
   const getProject = async (id) => {
     const { data, error } = await useFetch(`/api/projects/${id}/`, {
       headers: {
+        Accept: "application/json",
         Authorization: `Bearer ${accessandrefresh().access}`,
       },
       async onRequest({ request, options }) {
-        if (!authStore.hasexp().value) return request;
+        if (!hasexp().value) return request;
         else {
-          const token = await authStore.authStore.updateToken();
+          const token = await updateToken();
           options.headers.Authorization = `Bearer ${token.access}`;
         }
       },
     });
     if (error.value) {
-      // authStore.access_refresh = {};
-      // localStorage.clear();
+      authStore.access = null;
+      authStore.refresh = null;
+      localStorage.clear();
       console.log(error.value + " this is from project store");
     }
     projects.value = data.value;
@@ -108,9 +105,9 @@ export const useProjects = defineStore("projects", () => {
         },
         body: formData,
         async onRequest({ request, options }) {
-          if (!authStore.hasexp().value) return request;
+          if (!hasexp().value) return request;
           else {
-            const token = await authStore.updateToken();
+            const token = await updateToken();
             options.headers.Authorization = `Bearer ${token.access}`;
             // checking if the local storage has expired
           }
@@ -133,12 +130,13 @@ export const useProjects = defineStore("projects", () => {
         {
           method: "post",
           headers: {
+            Accept: "application/json",
             Authorization: `Bearer ${accessandrefresh().access}`,
           },
           async onRequest({ request, options }) {
-            if (!authStore.hasexp().value) return request;
+            if (!hasexp().value) return request;
             else {
-              const token = await authStore.updateToken();
+              const token = await updateToken();
               options.headers.Authorization = `Bearer ${token.access}`;
             }
           },
@@ -162,9 +160,9 @@ export const useProjects = defineStore("projects", () => {
           Authorization: `Bearer ${accessandrefresh().access}`,
         },
         async onRequest({ request, options }) {
-          if (!authStore.hasexp().value) return request;
+          if (!hasexp().value) return request;
           else {
-            const token = await authStore.updateToken();
+            const token = await updateToken();
             options.headers.Authorization = `Bearer ${token.access}`;
             // checking if the local storage has expired
           }
@@ -180,14 +178,13 @@ export const useProjects = defineStore("projects", () => {
     try {
       slug.value = jwtDecode(accessandrefresh().access).slug;
       const { data, error } = await useFetch(`/api/profile/${slug.value}/`, {
-        key: "profile",
         headers: {
           Authorization: `Bearer ${accessandrefresh().access}`,
         },
         async onRequest({ request, options }) {
-          if (!authStore.hasexp().value) return request;
+          if (!hasexp().value) return request;
           else {
-            const token = await authStore.updateToken();
+            const token = await updateToken();
             options.headers.Authorization = `Bearer ${token.access}`;
           }
         },
@@ -195,9 +192,10 @@ export const useProjects = defineStore("projects", () => {
       profile.value = data?.value;
       return data;
     } catch (error) {
-      // authStore.access_refresh = null;
-      // localStorage.clear();
-      console.log(error + " this is from project store");
+      authStore.access = null;
+      authStore.refresh = null;
+      localStorage.clear();
+      console.log(error.value + " this is from project store");
     }
   };
   return {
@@ -208,6 +206,8 @@ export const useProjects = defineStore("projects", () => {
     likeFn,
     updateProfile,
     getProfile,
+    hasexp,
+    updateToken,
     accessandrefresh,
     filterValue,
     likedProjects,

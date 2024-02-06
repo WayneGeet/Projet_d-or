@@ -1,6 +1,14 @@
 <template>
     <div>
         <Mapbox title="Welcome to Map View" :onClick="(e)=>console.log(e.lngLat)" :control="control" style="position: relative; top: 0; bottom: 0;" mapId="projects">
+          <!-- <div class="flex flex-col text-2xl text-black absolute top-0 right-5 z-20 text-center items-center justify-center">
+          <div @click="() => zoomControl('add')" class="hover:bg-gray-100 cursor-pointer font-bold w-5 h-5 border bg-white p-3 text-center mb-1 flex justify-center items-center">
+            <p><IconesAdd/></p>
+          </div>
+          <div @click="() => zoomControl('minus')" class="hover:bg-gray-100 cursor-pointer font-bold w-5 h-5 border bg-white p-3 text-center mb-1 flex justify-center items-center">
+            <p><IconesMinus/></p>
+          </div>
+        </div> -->
 
           <article v-for="location in locations" :key="location.id">
               <MapboxDefaultMarker
@@ -14,7 +22,7 @@
                 :options="{
                   closeOnClick:true,
                   className:'popup',
-                  maxWidth:'250px'
+                  maxWidth:'300px'
                 }"
               >
                 <div class="rounded-md border border-sky-400 overflow-y-auto">
@@ -95,7 +103,7 @@ import { useProjects } from "~/store/project"
 .popup{
   max-width:5rem;
   overflow:scroll;
-  height:5rem;
+  height:7rem;
 
 }
 

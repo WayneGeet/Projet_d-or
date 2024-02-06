@@ -1,6 +1,6 @@
 <template>
     <main v-if="user_profile">
-        <section class="mx-10 max-h-[80vh] pb-10 shadow-sm 
+        <section class="mx-10 max-h-[60vh] shadow-sm 
         shadow-gray-300 pt-[5rem] pb-20">
             <article class="grid grid-cols-2 max-w-lg m-auto">
                 <div class="rounded-full ">
@@ -12,7 +12,7 @@
                         <li class="text-gray-500">{{ user_profile.county }}</li>
                         <li v-if="user_profile.phone_number">0{{ user_profile.phone_number }}</li>
                     </menu>
-                    <Nuxt-Link to="/accounts/profile/" class=" text-center block outline px-3 py-2 outline-gray-100 rounded-md hover:bg-black hover:bg-opacity-80
+                    <Nuxt-Link to="/accounts/profile/get-started" class=" text-center block outline px-3 py-2 outline-gray-100 rounded-md hover:bg-black hover:bg-opacity-80
                      transition-colors text-sm duration-300 hover:outline-gray-200 hover:text-white text-black">
                         Edit Profile
                     </Nuxt-Link>

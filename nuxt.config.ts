@@ -43,7 +43,7 @@ export default defineNuxtConfig({
   },
   modules: ['@pinia/nuxt', 'nuxt-mapbox', 'dayjs-nuxt'],
   mapbox:{
-    accessToken:process.env.API_KEY
+    accessToken:"pk.eyJ1Ijoid2F5bmUtZ2VldCIsImEiOiJjbGtjZWlnOXQwMmRiM2twZG05b2VldmcyIn0.93DilXpZMzPqgn_C7Y7L3w"
   },
   runtimeConfig:{
     "public": {},
