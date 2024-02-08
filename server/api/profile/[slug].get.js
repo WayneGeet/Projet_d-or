@@ -3,15 +3,12 @@ export default defineEventHandler(async (event) => {
   console.log(slug, "from get");
   try {
     const token = getRequestHeader(event, "authorization");
-    const response = await fetch(
-      `http://127.0.0.1:8000/users/profiles/${slug}/`,
-      {
-        method: "get",
-        headers: {
-          Authorization: token,
-        },
-      }
-    );
+    const response = await fetch(`http://127.0.0.1:8000/profile/${slug}/`, {
+      method: "get",
+      headers: {
+        Authorization: token,
+      },
+    });
     if (!response.ok) {
       setResponseStatus(event, 401);
       throw createError({

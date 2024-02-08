@@ -6,16 +6,13 @@ export default defineEventHandler(async (event) => {
     console.log(fd, "this is the formdata");
 
     const token = getRequestHeader(event, "authorization");
-    const response = await fetch(
-      `http://127.0.0.1:8000/users/profiles/${slug}/`,
-      {
-        method: "put",
-        headers: {
-          Authorization: token,
-        },
-        body: fd,
-      }
-    );
+    const response = await fetch(`http://127.0.0.1:8000/profile/${slug}/`, {
+      method: "put",
+      headers: {
+        Authorization: token,
+      },
+      body: fd,
+    });
     if (!response.ok) {
       setResponseStatus(event, 401);
       throw createError({

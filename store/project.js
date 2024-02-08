@@ -10,6 +10,7 @@ export const useProjects = defineStore("projects", () => {
   const dayjs = useDayjs();
   const profile = ref(undefined);
   const filterValue = ref("");
+  const project_type_filter = ref("");
   const likedProjects = ref(getData("liked") || []);
   const accessandrefresh = () => {
     return { access: authStore.access, refresh: authStore.refresh };
@@ -41,7 +42,7 @@ export const useProjects = defineStore("projects", () => {
   const getProjects = async () => {
     try {
       const { data, error } = await useFetch(
-        `/api/projects/?search=${filterValue.value}`,
+        `/api/projects/?search=${filterValue.value}&&project_type=${project_type_filter.value}`,
         {
           cache: false,
           headers: {
@@ -126,7 +127,7 @@ export const useProjects = defineStore("projects", () => {
   const likeFn = async (id) => {
     try {
       const { data, error } = await useFetch(
-        `http://127.0.0.1:8000/projects/${id}/like/`,
+        `http://127.0.0.1:8000/projects/${id}/like_or_dislike/`,
         {
           method: "post",
           headers: {

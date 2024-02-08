@@ -62,11 +62,8 @@ import { storeToRefs } from "pinia";
 
 const AuthStore = useAuth()
 const ProjectStore = useProjects()
-AuthStore.$subscribe((event)=> console.log("watching authstore"))
 const {access} = storeToRefs(AuthStore)
 const {projects} = storeToRefs(ProjectStore)
-
-
 
 // <---------------states------------------>
 const showDD = ref(true)
@@ -84,8 +81,15 @@ const search = async () => {
 }
 
 const selectedType = (item) => {
-    type.value = item
-}
+    if(item.value === "show all") return ""
+    else{
+        type.value = item
+        ProjectStore.project_type_filter = item
+        console.log(type.value, " this is selected project")
+        showDD.value =false
+    }
+    }
+    
 
 const profileNav = (location) => {
     switch(location){

@@ -15,23 +15,6 @@ export default defineNuxtConfig({
         { hid: "description", name: "description", content: "" },
         { name: "format-detection", content: "telephone=no" },
       ],
-      script: [
-        {
-          src: "https://accounts.google.com/gsi/client",
-        },
-        {
-          src: "https://apis.google.com/js/platform.js",
-          async: true,
-          defer: true,
-        },
-        {
-          src: `https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_MAP_API_KEY}&callback=Function.prototype&libraries=drawing`,
-        },
-        {
-          src: "https://ajax.googleapis.com/ajax/libs/earthengine/0.1.343/earthengine-api.min.js",
-        },
-      ],
-      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
     },
   },  
   
