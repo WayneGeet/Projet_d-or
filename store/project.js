@@ -40,11 +40,11 @@ export const useProjects = defineStore("projects", () => {
   };
 
   const getProjects = async () => {
+    console.log("project type", project_type_filter.value);
     try {
       const { data, error } = await useFetch(
-        `/api/projects/?search=${filterValue.value}&&project_type=${project_type_filter.value}`,
+        `/api/projects/?search=${filterValue.value}&project_type=${project_type_filter.value}`,
         {
-          cache: false,
           headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessandrefresh().access}`,
@@ -97,6 +97,7 @@ export const useProjects = defineStore("projects", () => {
   };
 
   const postProject = async (formData) => {
+    console.log("formdata", formData);
     const { data: message, error } = await useLazyFetch(
       "http://127.0.0.1:8000/projects/",
       {
@@ -211,6 +212,7 @@ export const useProjects = defineStore("projects", () => {
     updateToken,
     accessandrefresh,
     filterValue,
+    project_type_filter,
     likedProjects,
   };
 });

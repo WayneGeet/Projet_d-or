@@ -217,7 +217,7 @@ const handleSubmit = async () => {
     fd.append("about", about.value)
     fd.append("phase", phase.value.toLowerCase())
 
-    const {msg} = await ProjectStore.postProject(fd)   
+    const msg = await ProjectStore.postProject(fd)   
     console.log(msg) 
     navigateTo("/projects/")
 }

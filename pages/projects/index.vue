@@ -52,7 +52,6 @@ const ProjectStore = useProjects()
 await ProjectStore.getProjects("")   
 const prjs = ProjectStore.projects
 projects.value = prjs?.features
-console.log(projects.value[0])
 
 watch([() => ProjectStore.filterValue, () => ProjectStore.likedProjects], async (oldValue, newValue) => {
     await ProjectStore.getProjects()

@@ -1,10 +1,10 @@
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
-  console.log(query.search);
+  console.log("query parameters", query.search);
   try {
     const token = getRequestHeader(event, "authorization");
     const response = await fetch(
-      `http://127.0.0.1:8000/projects/?search=${query.search}`,
+      `http://127.0.0.1:8000/projects/?search=${query.search}&project_type=${query.project_type}`,
       {
         method: "get",
         headers: {

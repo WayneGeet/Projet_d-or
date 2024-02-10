@@ -14,9 +14,9 @@
                         </div>
                     </div>
 
-                    <menu :class="{'hidden':showDD}" class="max-h-[45vh] mt-2 overflow-auto transition-all duration-700 absolute left-0 top-full w-full bg-slate-100 rounded-md px-2 py-2
+                    <menu :class="{'hidden':showDD}" class="shadow-md shadow-gray-300 max-h-[45vh] mt-2 overflow-auto transition-all duration-700 absolute left-0 top-full w-full z-50 bg-white bg-opacity-20 backdrop-blur-sm rounded-md px-2 py-2
                     flex flex-col gap-2">
-                        <div @click="selectedType(item)" :class="{'bg-slate-300 text-gray-600 font-medium':type===item}" class="text-gray-500 cursor-pointer hover:bg-slate-200 rounded-md p-[4px] text-sm z-20" v-for="item in items" :key="item">
+                        <div @click="selectedType(item)" :class="{'bg-slate-300 text-gray-600 font-medium':type===item}" class="  text-gray-500 cursor-pointer hover:bg-slate-200 rounded-md p-[4px] text-sm" v-for="item in items" :key="item">
                             <li class="">{{ item }}</li>
                         </div>
                     </menu>
@@ -31,17 +31,20 @@
                 <div @click="search()" class="w-6 h-6 p-4 relative -top-full cursor-pointer bg-[#228cdb] transition-colors duration-400 hover:bg-sky-600 rounded-md text-white flex items-center justify-center">
                     <div class=""><IconesSearch/></div>
                 </div>
+                <div class="">
+                    <button @click="clear()" class="block px-3 py bg-transparent text-blue-500 rounded-md border-2 border-slate-300 shadow-sm shadow-gray-100 hover:bg-sky-600 transition-colors duration-400 hover:text-white">clear</button>
+                </div>
             </div>
         </section>
         <div class="bg-[#228cdb] text-white hover:bg-sky-700 transition-colors duration-400 rounded-md px-3 py-2 text-sm text-center cursor-pointer left-16 relative" @click="navigateTo('/projects/create')">
             <h2>+ Post your project</h2>
         </div>
 
-        <section class="relative w-[10rem] left-5">
-            <div @mouseenter="showProf = false" @click="showProf = !showProf" class="relative left-[50%] cursor-pointer rounded-full border-4 border-white w-8 h-8">
-                <img src="" alt="">
+        <section class="relative w-[10rem] left-5 z-50">
+            <div @mouseenter="showProf = false" @click="showProf = !showProf" class="relative left-[50%] cursor-pointer rounded-full border-4 border-white w-10 h-10 overflow-hidden">
+                <img class="rounded-full  w-full object-cover" :src="photo" alt="photo">
             </div>
-            <div :class="{'hidden':showProf}" class="absolute top-10 shadow-gray-400 shadow-md rounded-md py-2 w-full bg-white bg-opacity-10 backdrop-blur-sm">
+            <div :class="{'hidden':showProf}" @mouseleave="showProf = true" class="absolute top-10 shadow-gray-400 shadow-md rounded-md py-2 w-full bg-white bg-opacity-20 backdrop-blur-sm">
                 <menu>
                     <div @click="profileNav(i)" class="text-sm hover:bg-slate-100 cursor-pointer py-[4px] px-3 hover:text-blue-400 hover:font-medium rounded-sm" v-for="i in values" :key="i">
                         <li>{{ i }}</li>
@@ -62,39 +65,49 @@ import { storeToRefs } from "pinia";
 
 const AuthStore = useAuth()
 const ProjectStore = useProjects()
-const {access} = storeToRefs(AuthStore)
-const {projects} = storeToRefs(ProjectStore)
+// const {access} = storeToRefs(AuthStore)
+// const {projects} = storeToRefs(ProjectStore)
+const photo = ref(null)
+const first_name = ref("")
+const last_name = ref("")
+onMounted(async () => {
+    const profileData = await ProjectStore.getProfile()
+    photo.value = `http://127.0.0.1:8000/${profileData.value.photo}/`
+    first_name.value = profileData.value.first_name
+    last_name.value = profileData.value.last_name
+    console.log("photo", photo)
+})
 
 // <---------------states------------------>
 const showDD = ref(true)
 const type = ref('Project Type')
-const items = ref(['Food Security','Water and Sanitization','Transport','Urbanization','Education', 'show all'])
+const items = ref(['Food Security','Water and Sanitization','Transport','Urban','Education'])
 const search_value = ref("")
 // user profile
 const values = ref(['profile', 'post a project', 'view map', 'logout'])
 const showProf = ref(true)
-const profileData = await ProjectStore.getProfile()
-const getName = profileData?.value
 // <--------------methods------------------>
 const search = async () => {
+    await navigateTo("/projects/")
     ProjectStore.filterValue = search_value.value
+    if(type.value === "Project Type"){
+        ProjectStore.project_type_filter = ""
+    }
+    else ProjectStore.project_type_filter = type.value
+    console.log("project type", type.value, ProjectStore.project_type_filter)
 }
 
 const selectedType = (item) => {
-    if(item.value === "show all") return ""
-    else{
-        type.value = item
-        ProjectStore.project_type_filter = item
-        console.log(type.value, " this is selected project")
-        showDD.value =false
-    }
-    }
+    type.value = item
+    showDD.value = true
+    console.log("showDD", showDD.value)
+}
     
 
 const profileNav = (location) => {
     switch(location){
         case 'profile':
-            navigateTo(`/accounts/profile/${getName.first_name}_${getName.last_name[0]}/`)
+            navigateTo(`/accounts/profile/${first_name.value}_${last_name.value[0]}/`)
             break;
         case 'post a project':
             navigateTo("/projects/create/")
@@ -106,6 +119,13 @@ const profileNav = (location) => {
             handleLogout()
             break;
     }
+}
+
+const clear = async () => {
+    type.value = "Project Type"
+    search_value.value = ""
+    await search()
+
 }
 
 // watch(() => user, () => {
