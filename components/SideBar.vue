@@ -16,45 +16,43 @@
    
     const setActive = async (i, item) => {
       activeClass.value = i + 1
-      setData("active-link", activeClass.value, 15, "d")
+      setData("active-link", activeClass.value, 9999, "m")
       await navigateTo(item.link)
     }
-    onMounted(async () => {
+    onBeforeMount(async () => {
       if(!activeClass.value){
-        setData("active-link", activeClass.value, 15, "d")
+        setData("active-link", 1, 9999, "m")
         activeClass.value = getData("active-link")
         await navigateTo("/projects")
       }
-    })
-
-  
-        const sidebarItems =ref ([
-          {
-            iconComponent: 'IconesBuilding', // The component name for the building icon
-            link: '/projects',
-            text: 'projects',
-          },
-          {
-            iconComponent: 'IconesUsers', // The component name for the users icon
-            link: '/#',
-            text: 'users',
-          },
-          {
-            iconComponent: 'IconesGis', // The component name for the GIS icon
-            link: '/#',
-            text: 'gis',
-          },
-          {
-            iconComponent: 'IconesCall', // The component name for the call icon
-            link: '/#',
-            text: 'reach us',
-          },
-          {
-            iconComponent: 'IconesBuilding', // The component name for the call icon
-            link: '/map-view/',
-            text: 'view in map',
-          },
-        ])
+    })  
+    const sidebarItems =ref ([
+      {
+        iconComponent: 'IconesBuilding', // The component name for the building icon
+        link: '/projects',
+        text: 'projects',
+      },
+      {
+        iconComponent: 'IconesUsers', // The component name for the users icon
+        link: '/#',
+        text: 'users',
+      },
+      {
+        iconComponent: 'IconesGis', // The component name for the GIS icon
+        link: '/#',
+        text: 'gis',
+      },
+      {
+        iconComponent: 'IconesCall', // The component name for the call icon
+        link: '/#',
+        text: 'reach us',
+      },
+      {
+        iconComponent: 'IconesBuilding', // The component name for the call icon
+        link: '/map-view/',
+        text: 'view in map',
+      },
+    ])
         // return{setActive, activeClass}
   </script>
 

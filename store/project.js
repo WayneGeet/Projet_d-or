@@ -11,7 +11,7 @@ export const useProjects = defineStore("projects", () => {
   const profile = ref(undefined);
   const filterValue = ref("");
   const project_type_filter = ref("");
-  const likedProjects = ref(getData("liked") || []);
+  const likedProjects = ref(getData("liked_projects") || []);
   const accessandrefresh = () => {
     return { access: authStore.access, refresh: authStore.refresh };
   };
@@ -200,6 +200,42 @@ export const useProjects = defineStore("projects", () => {
       console.log(error.value + " this is from project store");
     }
   };
+
+  const getLikedProjects = async () => {
+    try {
+      slug.value = jwtDecode(accessandrefresh().access).slug;
+      const { data, error } = await useFetch(
+        `http://127.0.0.1:8000/users/${slug.value}/me/`,
+        {
+          pick: ["liked_projects"],
+          method: "get",
+          // body: { slug: slug.value },
+          headers: {
+            Authorization: `Bearer ${accessandrefresh().access}`,
+          },
+          async onRequest({ request, options }) {
+            console.log("hasexp", hasexp().value);
+            if (!hasexp().value) return request;
+            else {
+              const token = await updateToken();
+              options.headers.Authorization = `Bearer ${token.access}`;
+            }
+          },
+        }
+      );
+      if (error.value) {
+        console.error("get user error", error.value);
+        throw createError("Getting user from backend failed");
+      }
+      likedProjects.value = await data.value.liked_projects;
+      setData("liked_projects", likedProjects.value, 9999, "m");
+      console.log("liked_projects", likedProjects.value);
+      return;
+    } catch (e) {
+      console.error("get liked projects in auth", e);
+      throw createError("Ooh snap!");
+    }
+  };
   return {
     getProjects,
     getProject,
@@ -214,5 +250,6 @@ export const useProjects = defineStore("projects", () => {
     filterValue,
     project_type_filter,
     likedProjects,
+    getLikedProjects,
   };
 });

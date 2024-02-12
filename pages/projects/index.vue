@@ -37,9 +37,9 @@
 
 <script setup>
 import {useProjects} from "~/store/project";
-import { jwtDecode } from "jwt-decode";
 import {useAuth} from "~/store/auth";
 import { setData } from 'nuxt-storage/local-storage';
+// import { accessandrefresh } from "~/utils/auth";
 const authStore = useAuth()
 definePageMeta({
     layout:"default",
@@ -49,9 +49,17 @@ definePageMeta({
 // states
 const projects = ref(null)
 const ProjectStore = useProjects()
-await ProjectStore.getProjects("")   
-const prjs = ProjectStore.projects
-projects.value = prjs?.features
+
+onBeforeMount( async () => {
+    await ProjectStore.getProjects()   
+    const prjs = ProjectStore.projects
+    projects.value = prjs?.features
+    await ProjectStore.getLikedProjects()
+    console.log("liked projects from index", ProjectStore.likedProjects)
+    
+    // console.log("accessandrefreshtoken", accessandrefresh())
+    
+})
 
 watch([() => ProjectStore.filterValue, () => ProjectStore.likedProjects], async (oldValue, newValue) => {
     await ProjectStore.getProjects()

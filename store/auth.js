@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
 import nuxtStorage from "nuxt-storage";
-// import { jwtDecode } from "jwt-decode";
+import { useProjects } from "~/store/project";
+import { jwtDecode } from "jwt-decode";
 
 export const useAuth = defineStore("authentication", () => {
   const access = ref(nuxtStorage.localStorage.getData("access"));
   const refresh = ref(nuxtStorage.localStorage.getData("refresh"));
   const slug = ref("");
+  const ProjectStore = useProjects();
   // const loading = ref(false);
   const registration = async ({ fname, lname, email, id_no, password }) => {
     const { data, error } = await useFetch("/api/register", {
