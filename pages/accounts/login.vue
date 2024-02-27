@@ -19,7 +19,7 @@
 
 <script setup>
 definePageMeta({
-    layout:"start",
+    layout:"project",
 })
 import { useAuth } from '~/store/auth';
 import {useProjects} from '~/store/project'

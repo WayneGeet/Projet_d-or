@@ -15,9 +15,16 @@ export default defineNuxtConfig({
         { hid: "description", name: "description", content: "" },
         { name: "format-detection", content: "telephone=no" },
       ],
+      link:[
+        {rel:"stylesheet", href:"https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css"}
+      ],
       script:[
-        {src:"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"}
-      ]
+        {src: `https://maps.googleapis.com/maps/api/js?v=beta&key=${process.env.GOOGLE_MAP_API_KEY}&callback=Function.prototype&libraries=marker`
+      },
+      {
+        src:`https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js`
+      }
+    ]
     },
   },  
   

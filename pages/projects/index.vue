@@ -1,6 +1,5 @@
 <template>
-    <div class="bg-slate-100 overflow-hidden min-h-screen px-5 py-5">
-        <p>Welcome </p>
+    <div class="bg-[#ffffff] overflow-hidden min-h-screen px-5 py-5">
         <section class="">
             
             <div v-if="projects" class="grid-custom">
@@ -28,9 +27,10 @@
                         />
                     </div>
                     </article>
-
             </div>
-            <h2 v-else>No projects</h2>
+            <div class="w-full flex justify-center" v-else-if="ProjectStore.pending">
+                <img src="~/assets/images/loader_2.gif" alt="">
+            </div>
         </section>
     </div>
 </template>
@@ -50,14 +50,12 @@ definePageMeta({
 const projects = ref(null)
 const ProjectStore = useProjects()
 
-onBeforeMount( async () => {
+onMounted( async () => {
     await ProjectStore.getProjects()   
     const prjs = ProjectStore.projects
     projects.value = prjs?.features
     await ProjectStore.getLikedProjects()
-    console.log("liked projects from index", ProjectStore.likedProjects)
     
-    // console.log("accessandrefreshtoken", accessandrefresh())
     
 })
 
@@ -70,19 +68,16 @@ watch([() => ProjectStore.filterValue, () => ProjectStore.likedProjects], async 
 
 const likeFn = async (post) => {
     const data = await ProjectStore.likeFn(post.id)
-    console.log(data.message, " this is the message from likeFn")
     await ProjectStore.getProject(post.id)
     if(data.message === "You have disliked this project"){
         ProjectStore.likedProjects = ProjectStore.likedProjects.filter(i => i !== post.id)
-        console.log(ProjectStore.likedProjects, " removed the project's id")
-        setData("liked", ProjectStore.likedProjects, 15, "d")
+        setData("liked", ProjectStore.likedProjects, 1000, "d")
         return 
     }
     else
     {
         ProjectStore.likedProjects = [...ProjectStore.likedProjects, post.id]
-        setData("liked", ProjectStore.likedProjects, 15, "d")
-        console.log(ProjectStore.likedProjects, " added the user's like")
+        setData("liked", ProjectStore.likedProjects, 1000, "d")
         return null
     }
 }

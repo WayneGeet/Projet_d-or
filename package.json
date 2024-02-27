@@ -29,6 +29,7 @@
     "jwt-decode": "^4.0.0",
     "mitt": "^3.0.1",
     "nuxt-gmaps": "^1.2.10",
-    "nuxt-storage": "^1.2.2"
+    "nuxt-storage": "^1.2.2",
+    "vue3-toastify": "^0.2.1"
   }
 }

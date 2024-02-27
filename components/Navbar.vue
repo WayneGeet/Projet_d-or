@@ -1,12 +1,12 @@
 <template>
-    <header class="flex bg-blue-100 items-center justify-around">
+    <header class="flex bg-[#122B45] items-center justify-around">
         <div @click="navigateTo('/projects/')">
             <img class="w-20 h-20 object-contain" src="~/assets/images/logo.jpg" alt="logo">
         </div>
         <section class="flex items-center gap-6">
             <div>
                 <div class="relative min-w-[12rem] transition-all duration-500">
-                    <div @click="showDD = !showDD" class="bg-slate-100 gap-5 flex justify-between items-center px-4 rounded-md py-2">
+                    <div @click="showDD = !showDD" class="bg-[#eeeff0] gap-5 flex justify-between items-center px-4 rounded-md py-2">
                         <span class="text-slate-600 text-sm whitespace-nowrap font-semibold">{{type}}</span>
                         <div class=" transition-all duration-300 ">
                             <div v-if="showDD===false"><IconesDropDown/></div>
@@ -24,30 +24,30 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <input class="px-3 py-2 w-[17rem] relative text-sm bg-slate-100 text-slate-500 rounded-md
+                <input class="px-3 py-2 w-[17rem] relative text-sm bg-[#eeeff0] text-slate-500 rounded-md
                 border-none outline-none" type="text" name="search" id="search"
                 placeholder="search location, title, budget etc.."
                 v-model="search_value" >
-                <div @click="search()" class="w-6 h-6 p-4 relative -top-full cursor-pointer bg-[#228cdb] transition-colors duration-400 hover:bg-sky-600 rounded-md text-white flex items-center justify-center">
+                <div @click="search()" class="w-6 h-6 p-4 relative -top-full cursor-pointer bg-[#EF8354] transition-colors duration-400 hover:bg-sky-600 rounded-md text-white flex items-center justify-center">
                     <div class=""><IconesSearch/></div>
                 </div>
                 <div class="">
-                    <button @click="clear()" class="block px-3 py bg-transparent text-blue-500 rounded-md border-2 border-slate-300 shadow-sm shadow-gray-100 hover:bg-sky-600 transition-colors duration-400 hover:text-white">clear</button>
+                    <button @click="clear()" class="block px-3 py text-[#EF8354] rounded-md shadow-sm shadow-[#EF8354] bg-[#ffffff] hover:bg-[#122b45] transition-colors duration-400 hover:text-white">clear</button>
                 </div>
             </div>
         </section>
-        <div class="bg-[#228cdb] text-white hover:bg-sky-700 transition-colors duration-400 rounded-md px-3 py-2 text-sm text-center cursor-pointer left-16 relative" @click="navigateTo('/projects/create')">
+        <div class="bg-[#EF8354] text-white hover:bg-sky-700 transition-colors duration-400 rounded-md px-3 py-2 text-sm text-center cursor-pointer left-16 relative" @click="navigateTo('/projects/create')">
             <h2>+ Post your project</h2>
         </div>
 
-        <section class="relative w-[10rem] left-5 z-50">
-            <div @mouseenter="showProf = false" @click="showProf = !showProf" class="relative left-[50%] cursor-pointer rounded-full border-4 border-white w-10 h-10 overflow-hidden">
+        <section class="relative w-[10rem] left-5 z-50" @mouseleave="showProf = true">
+            <div @click="profileNav('profile')" @mouseenter="showProf = false" class="relative left-[50%] cursor-pointer rounded-full border-4 border-white w-10 h-10 overflow-hidden">
                 <img class="rounded-full  w-full object-cover" :src="photo" alt="photo">
             </div>
-            <div :class="{'hidden':showProf}" @mouseleave="showProf = true" class="absolute top-10 shadow-gray-400 shadow-md rounded-md py-2 w-full bg-white bg-opacity-20 backdrop-blur-sm">
+            <div :class="{'hidden':showProf}"  class="absolute top-10 shadow-gray-400 shadow-md rounded-md py-2 w-full bg-white bg-opacity-20 backdrop-blur-sm">
                 <menu>
-                    <div @click="profileNav(i)" class="text-sm hover:bg-slate-100 cursor-pointer py-[4px] px-3 hover:text-blue-400 hover:font-medium rounded-sm" v-for="i in values" :key="i">
-                        <li>{{ i }}</li>
+                    <div @click="profileNav(i)" class="text-sm cursor-pointer py-[4px] px-3 hover:bg-[#eeeff0] hover:font-medium rounded-sm" v-for="i in values" :key="i">
+                        <li class="text-[#122B45]">{{ i }}</li>
                     </div>
                 </menu>
             </div>
@@ -70,12 +70,19 @@ const ProjectStore = useProjects()
 const photo = ref(null)
 const first_name = ref("")
 const last_name = ref("")
+// routing
 onMounted(async () => {
-    const profileData = await ProjectStore.getProfile()
-    photo.value = `http://127.0.0.1:8000/${profileData.value.photo}/`
-    first_name.value = profileData.value.first_name
-    last_name.value = profileData.value.last_name
-    console.log("photo", photo)
+        try {
+            const profileData = await ProjectStore.getProfile()
+            photo.value = `http://127.0.0.1:8000/${profileData.value.photo}/`
+            first_name.value = profileData.value.first_name
+            last_name.value = profileData.value.last_name
+            
+        } catch (error) {
+            console.error("error from navbar", error)
+            
+        }
+    
 })
 
 // <---------------states------------------>
@@ -94,13 +101,11 @@ const search = async () => {
         ProjectStore.project_type_filter = ""
     }
     else ProjectStore.project_type_filter = type.value
-    console.log("project type", type.value, ProjectStore.project_type_filter)
 }
 
 const selectedType = (item) => {
     type.value = item
     showDD.value = true
-    console.log("showDD", showDD.value)
 }
     
 
@@ -129,7 +134,6 @@ const clear = async () => {
 }
 
 // watch(() => user, () => {
-//     console.log(user.value, "user has changed do something!")
 // } )
 
 const handleLogout = () => {

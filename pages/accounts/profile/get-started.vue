@@ -8,7 +8,7 @@
                 </div>
                 <div class="w-full">
                     <label for="county" class="text-sm">County</label>
-                    <input required class="w-full px-3 py-2 border-b outline-none border-300 focus:shadow-sm focus:shadow-gray-100 focus:border-gray-400" type="text" id="county" v-model="county">
+                    <input  class="w-full px-3 py-2 border-b outline-none border-300 focus:shadow-sm focus:shadow-gray-100 focus:border-gray-400" type="text" id="county" v-model="county">
                 </div>
                 <div class="w-full">
                     <label for="" class="text-sm">Profile Photo</label>
@@ -17,7 +17,7 @@
                 </div>
             </article>
 
-            <button type="submit" class="bg-blue-400 rounded-md w-full px-4 py-2">Create</button>
+            <button type="submit" class="bg-[#EF8354] text-white focus:bg-[#122B43] rounded-md w-full px-4 py-2">Save Changes</button>
         </form>
     </section>
 </template>
@@ -27,6 +27,13 @@ import { useProjects } from '~/store/project';
 import {useAuth} from "~/store/auth"
 definePageMeta({
     middleware:"auth"
+})
+onMounted(async() => {
+    await ProjectStore.getProfile()
+    phone_number.value = `0${ProjectStore.profile.phone_number}`
+    county.value = ProjectStore.profile.county
+    photo.value = ProjectStore.profile.photo
+
 })
 
 const ProjectStore = useProjects()
@@ -52,9 +59,9 @@ const handleSubmit = async () => {
 
 <style scoped>
     input[type="file"]::file-selector-button { 
-        background: orangered;
+        background: #122B45;
         color: white;
-        border: 1px solid orangered;
+        border: 1px solid #122B45;
         border-radius: 5px;
         padding: 1rem 3rem;
         cursor:pointer;

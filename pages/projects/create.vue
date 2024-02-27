@@ -168,7 +168,6 @@ watch(search_text, async (newText, oldText) => {
         const { data, pending } = await useLazyFetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${search_text.value}.json?access_token=pk.eyJ1Ijoid2F5bmUtZ2VldCIsImEiOiJjbGtjZWlnOXQwMmRiM2twZG05b2VldmcyIn0.93DilXpZMzPqgn_C7Y7L3w&country=KE`, {
         })
         const places_value = await data.value
-        console.log(places_value)
         pend.value = pending.value
         places.value = places_value?.features
         const places_computed = computed(() => {
@@ -187,16 +186,13 @@ const control = ref({
 
 const showAlert = () => window.alert('sorry, this feature is not functional at this moment')
 const mapRef = useMapboxRef('create')
-      console.log(mapRef.value)
       
 
 const lnglat = ref(undefined)
 
 const handlePlaceSelect = (location) => {
-    console.log(location.place_name)
     county.value = location.place_name
     lnglat.value = location.center
-    console.log(lnglat.value)
     isWatching.value = false
     search_text.value = location.place_name
 }
@@ -218,7 +214,6 @@ const handleSubmit = async () => {
     fd.append("phase", phase.value.toLowerCase())
 
     const msg = await ProjectStore.postProject(fd)   
-    console.log(msg) 
     navigateTo("/projects/")
 }
 
