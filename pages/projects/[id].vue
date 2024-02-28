@@ -31,6 +31,12 @@ const id = useRoute().params.id
 // states
 const project = ref(null)
 const data = await ProjectStore.getProject(id)
+// if(!data.value){
+//     throw createError({
+//         statusCode:404,
+//         statusMessage:"Project Not Found"
+//     })
+// }
 project.value = data.value
 
 watch(() => ProjectStore.likedProjects, async () => {

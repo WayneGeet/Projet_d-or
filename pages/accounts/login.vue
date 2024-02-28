@@ -1,5 +1,8 @@
 <template>
     <section class="mx-auto max-w-2xl min-h-[100vh]">
+        <div v-if="authStore.error" class="text-red-400 text-sm ">
+            <p>{{ authStore.error }}</p>
+        </div>
         <form method="POST" class="grid gap-10 w-full px-7 py-5 items-start justify-center" @submit.prevent="login">
             <article class="flex flex-col gap-5 items-start justify-center">
                 <div class="w-full">
@@ -22,20 +25,19 @@ definePageMeta({
     layout:"project",
 })
 import { useAuth } from '~/store/auth';
-import {useProjects} from '~/store/project'
-// const {$bus} = useNuxtApp()
 const authStore = useAuth()
-const ProjectStore = useProjects()
 
 const email = ref("")
 const password = ref("")
 
 async function login() {
-    await authStore.setAuthentication({email:email.value, password:password.value})
-    await navigateTo(`/projects/`)
-    // $bus.$emit("auth-event", isAuthenticated)
+    const data = await authStore.setAuthentication({email:email.value, password:password.value})
+    if(data) {
+        console.log(authStore.tokens)
+        await navigateTo(`/projects/`)
+    }
+    else return
 }    
 
-// nuxtStorage.localStorage.setData('access_token1', );
 
 </script>

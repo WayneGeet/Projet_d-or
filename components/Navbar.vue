@@ -61,12 +61,9 @@
 <script setup>
 import {useAuth} from "~/store/auth.js"
 import {useProjects} from "~/store/project"
-import { storeToRefs } from "pinia";
 
 const AuthStore = useAuth()
 const ProjectStore = useProjects()
-// const {access} = storeToRefs(AuthStore)
-// const {projects} = storeToRefs(ProjectStore)
 const photo = ref(null)
 const first_name = ref("")
 const last_name = ref("")
@@ -74,15 +71,13 @@ const last_name = ref("")
 onMounted(async () => {
         try {
             const profileData = await ProjectStore.getProfile()
-            photo.value = `http://127.0.0.1:8000/${profileData.value.photo}/`
-            first_name.value = profileData.value.first_name
-            last_name.value = profileData.value.last_name
+            photo.value = profileData.value?.photo
+            first_name.value = profileData.value?.first_name
+            last_name.value = profileData.value?.last_name
             
         } catch (error) {
             console.error("error from navbar", error)
-            
         }
-    
 })
 
 // <---------------states------------------>

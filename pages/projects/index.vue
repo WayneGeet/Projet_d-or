@@ -28,8 +28,8 @@
                     </div>
                     </article>
             </div>
-            <div class="w-full flex justify-center" v-else-if="ProjectStore.pending">
-                <img src="~/assets/images/loader_2.gif" alt="">
+            <div class="w-full flex justify-center" v-else-if="!projects">
+                <h3>Sorry, No projects to view right now</h3>
             </div>
         </section>
     </div>

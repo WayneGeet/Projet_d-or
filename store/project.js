@@ -17,12 +17,14 @@ export const useProjects = defineStore("projects", () => {
   const slug = ref("");
 
   // toasts
-  const notify = () => {
-    useNuxtApp().$toast.info("yep", {
+  const post = (success) => {
+    useNuxtApp().$toast.info(`${success ? "yep" : "nop"}`, {
       autoClose: 2000,
       dangerouslyHTMLString: true,
+      backgroundColor: `${success ? "green" : "red"}`,
     });
   };
+
   const updateToken = async () => {
     const refreshToken = AuthStore.tokens.refresh;
     const { data: tokens } = await useFetch("/api/refresh/", {
@@ -115,17 +117,14 @@ export const useProjects = defineStore("projects", () => {
         }
       );
 
-      if (message.value) {
-        const notify = () => {
-          useNuxtApp().$toast.info("yep", {
-            autoClose: 2000,
-            dangerouslyHTMLString: true,
-            backgroundColor: "green",
-          });
-        };
-        notify("project added successfully");
+      if (!message.value) {
+        post(false);
+        throw createError({
+          statusCode: 500,
+          statusMessage: "Something went wrong while posting a project",
+        });
       }
-
+      post(true);
       return message.value;
     } catch (error) {
       throw createError({
@@ -157,8 +156,8 @@ export const useProjects = defineStore("projects", () => {
           },
         }
       );
+
       const response = await data?.value;
-      notify();
       return response;
     } catch (error) {
       console.error(error);
@@ -188,6 +187,10 @@ export const useProjects = defineStore("projects", () => {
       if (data.value) return data;
     } catch (error) {
       console.error(error.value);
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Error updating your profile",
+      });
     }
   };
 
@@ -210,9 +213,11 @@ export const useProjects = defineStore("projects", () => {
       profile.value = data?.value;
       return profile;
     } catch (error) {
-      console.error(error + " this is error from getProfile");
-      AuthStore.tokens = null;
-      localStorage.clear();
+      console.error(error + "from getProfile");
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Something went wrong while fetching your profile",
+      });
     }
   };
 
